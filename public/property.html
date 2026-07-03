@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Details - Urestate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Navbar -->
+<nav class="bg-white shadow p-4 flex justify-between items-center">
+    <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
+    <div id="navLinks" class="space-x-4"></div>
+</nav>
+
+<div class="max-w-4xl mx-auto p-4 mt-6">
+    <a href="/public/index.html" class="text-blue-600 hover:underline">&larr; Back to listings</a>
+    <div id="propertyDetail" class="bg-white rounded-lg shadow p-6 mt-4">
+        <p class="text-gray-500">Loading property details...</p>
+    </div>
+</div>
+
+<script>
+const navLinks = document.getElementById('navLinks');
+const token = localStorage.getItem('token');
+
+if (token) {
+    navLinks.innerHTML = `
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600">Calculator</a>
+        <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600">Add Property</a>
+        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600">My Dashboard</a>
+        <button id="logoutBtn" class="text-red-600 hover:underline">Logout</button>
+    `;
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/public/index.html';
+    });
+} else {
+    navLinks.innerHTML = `
+        <a href="/public/login.html" class="text-gray-700 hover:text-blue-600">Login</a>
+        <a href="/public/register.html" class="text-blue-600 font-semibold">Register</a>
+    `;
+}
+
+const params = new URLSearchParams(window.location.search);
+const propertyId = params.get('id');
+
+async function loadPropertyDetails() {
+    const container = document.getElementById('propertyDetail');
+    if (!propertyId) {
+        container.innerHTML = '<p class="text-red-500">No property selected.</p>';
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/properties/${propertyId}`);
+        if (!res.ok) {
+            container.innerHTML = '<p class="text-red-500">Property not found.</p>';
+            return;
+        }
+        const p = await res.json();
+
+        const imagesHtml = (p.images && p.images.length > 0)
+            ? p.images.map(img => `<img src="http://localhost:3000/${img.replace(/\\/g,'/')}" class="w-full h-64 object-cover rounded mb-2">`).join('')
+            : '<div class="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-400 rounded">No Image</div>';
+
+        container.innerHTML = `
+            ${imagesHtml}
+
+            <!-- Title & Price -->
+            <div class="flex justify-between items-start mt-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">${p.title}</h1>
+                    <p class="text-gray-500">${p.location}${p.address ? ' — ' + p.address : ''}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-blue-600 text-2xl font-bold">₹${Number(p.price).toLocaleString()} ${p.purpose === 'rent' ? '/month' : ''}</p>
+                    ${p.negotiable_price ? '<span class="text-green-600 text-sm">Price Negotiable</span>' : ''}
+                </div>
+            </div>
+
+            <!-- Badges -->
+            <div class="flex flex-wrap gap-2 mt-3">
+                ${p.property_type ? `<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">${p.property_type}</span>` : ''}
+                ${p.furnished_status ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">${p.furnished_status}</span>` : ''}
+                ${p.purpose ? `<span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">${p.purpose === 'rent' ? 'For Rent' : 'For Sale'}</span>` : ''}
+                ${p.parking ? '<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">Parking Available</span>' : ''}
+            </div>
+
+            <!-- Key Details Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 bg-gray-50 p-4 rounded-lg">
+                ${p.bedrooms ? `<div class="text-center"><p class="text-2xl font-bold text-gray-800">${p.bedrooms}</p><p class="text-gray-500 text-sm">Bedrooms</p></div>` : ''}
+                ${p.bathrooms ? `<div class="text-center"><p class="text-2xl font-bold text-gray-800">${p.bathrooms}</p><p class="text-gray-500 text-sm">Bathrooms</p></div>` : ''}
+                ${p.balconies ? `<div class="text-center"><p class="text-2xl font-bold text-gray-800">${p.balconies}</p><p class="text-gray-500 text-sm">Balconies</p></div>` : ''}
+                ${p.floor_number ? `<div class="text-center"><p class="text-2xl font-bold text="gray-800">${p.floor_number}/${p.total_floors || '?'}</p><p class="text-gray-500 text-sm">Floor</p></div>` : ''}
+            </div>
+
+            <!-- Size Details -->
+            ${(p.plot_size || p.built_up_area || p.carpet_area) ? `
+            <div class="mt-6">
+                <h2 class="text-lg font-semibold text-gray-700 mb-3">Size Details</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    ${p.plot_size ? `<div class="bg-gray-50 p-3 rounded"><p class="text-sm text-gray-500">Plot Size</p><p class="font-semibold">${p.plot_size} sq ft</p></div>` : ''}
+                    ${p.built_up_area ? `<div class="bg-gray-50 p-3 rounded"><p class="text-sm text-gray-500">Built-up Area</p><p class="font-semibold">${p.built_up_area} sq ft</p></div>` : ''}
+                    ${p.carpet_area ? `<div class="bg-gray-50 p-3 rounded"><p class="text-sm text-gray-500">Carpet Area</p><p class="font-semibold">${p.carpet_area} sq ft</p></div>` : ''}
+                </div>
+            </div>` : ''}
+
+            <!-- Other Details -->
+            <div class="mt-6">
+                <h2 class="text-lg font-semibold text-gray-700 mb-3">Property Details</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    ${p.property_age ? `<div class="bg-gray-50 p-3 rounded"><p class="text-sm text-gray-500">Property Age</p><p class="font-semibold">${p.property_age}</p></div>` : ''}
+                    ${p.facing ? `<div class="bg-gray-50 p-3 rounded"><p class="text-sm text-gray-500">Facing</p><p class="font-semibold">${p.facing}</p></div>` : ''}
+                    ${p.ownership_type ? `<div class="bg-gray-50 p-3 rounded"><p class="text-sm text-gray-500">Ownership</p><p class="font-semibold">${p.ownership_type}</p></div>` : ''}
+                    ${p.availability_date ? `<div class="bg-gray-50 p-3 rounded"><p class="text-sm text-gray-500">Available From</p><p class="font-semibold">${new Date(p.availability_date).toLocaleDateString()}</p></div>` : ''}
+                </div>
+            </div>
+
+            <!-- Description -->
+            ${p.description ? `
+            <div class="mt-6">
+                <h2 class="text-lg font-semibold text-gray-700 mb-2">Description</h2>
+                <p class="text-gray-600">${p.description}</p>
+            </div>` : ''}
+
+            <!-- Nearby Landmarks -->
+            ${p.nearby_landmarks ? `
+            <div class="mt-6">
+                <h2 class="text-lg font-semibold text-gray-700 mb-2">Nearby Landmarks</h2>
+                <p class="text-gray-600">${p.nearby_landmarks}</p>
+            </div>` : ''}
+
+            <!-- Posted date -->
+            <p class="text-gray-400 text-sm mt-6">Posted on: ${new Date(p.created_at).toLocaleDateString()}</p>
+        `;
+    } catch (error) {
+        container.innerHTML = '<p class="text-red-500">Error loading property.</p>';
+    }
+}
+
+loadPropertyDetails();
+</script>
+
+</body>
+</html>

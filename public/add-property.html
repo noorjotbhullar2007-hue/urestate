@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Property - Urestate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Navbar -->
+<nav class="bg-white shadow p-4 flex justify-between items-center">
+    <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
+    <div class="space-x-4">
+        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600">My Dashboard</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600">Calculator</a>
+        <button id="logoutBtn" class="text-red-600 hover:underline">Logout</button>
+    </div>
+</nav>
+
+<div class="max-w-2xl mx-auto p-6 mt-6 bg-white rounded-lg shadow">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">Add New Property</h1>
+
+    <form id="addPropertyForm">
+
+        <!-- Basic Info -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3">Basic Information</h2>
+
+        <input type="text" id="title" placeholder="Property Title *" required
+            class="w-full p-2 mb-3 border rounded">
+
+        <textarea id="description" placeholder="Description" rows="3"
+            class="w-full p-2 mb-3 border rounded"></textarea>
+
+        <div class="flex gap-3 mb-3">
+            <input type="number" id="price" placeholder="Price (₹) *" required
+                class="w-full p-2 border rounded">
+            <select id="purpose" required class="w-full p-2 border rounded">
+                <option value="">Purpose *</option>
+                <option value="rent">For Rent</option>
+                <option value="sell">For Sale</option>
+            </select>
+        </div>
+
+        <div class="flex gap-3 mb-3">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" id="negotiable_price">
+                <span class="text-sm text-gray-600">Price Negotiable</span>
+            </label>
+        </div>
+
+        <input type="text" id="location" placeholder="City/Area *" required
+            class="w-full p-2 mb-3 border rounded">
+
+        <input type="text" id="address" placeholder="Full Address"
+            class="w-full p-2 mb-3 border rounded">
+
+        <select id="property_type" class="w-full p-2 mb-3 border rounded">
+            <option value="">Property Type</option>
+            <option value="Flat">Flat</option>
+            <option value="House">House</option>
+            <option value="Plot">Plot</option>
+            <option value="Commercial">Commercial</option>
+        </select>
+
+        <!-- Size Details -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Size Details</h2>
+
+        <div class="flex gap-3 mb-3">
+            <input type="number" id="plot_size" placeholder="Plot Size (sq ft)"
+                class="w-full p-2 border rounded">
+            <input type="number" id="built_up_area" placeholder="Built-up Area (sq ft)"
+                class="w-full p-2 border rounded">
+        </div>
+
+        <input type="number" id="carpet_area" placeholder="Carpet Area (sq ft)"
+            class="w-full p-2 mb-3 border rounded">
+
+        <!-- Floor Details -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Floor Details</h2>
+
+        <div class="flex gap-3 mb-3">
+            <input type="number" id="floor_number" placeholder="Floor Number"
+                class="w-full p-2 border rounded">
+            <input type="number" id="total_floors" placeholder="Total Floors"
+                class="w-full p-2 border rounded">
+        </div>
+
+        <!-- Room Details -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Room Details</h2>
+
+        <div class="flex gap-3 mb-3">
+            <input type="number" id="bedrooms" placeholder="Bedrooms *" required
+                class="w-full p-2 border rounded">
+            <input type="number" id="bathrooms" placeholder="Bathrooms *" required
+                class="w-full p-2 border rounded">
+            <input type="number" id="balconies" placeholder="Balconies"
+                class="w-full p-2 border rounded">
+        </div>
+
+        <!-- Other Details -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Other Details</h2>
+
+        <div class="flex gap-3 mb-3">
+            <select id="furnished_status" required class="w-full p-2 border rounded">
+                <option value="">Furnished Status *</option>
+                <option value="Furnished">Furnished</option>
+                <option value="Semi-Furnished">Semi-Furnished</option>
+                <option value="Unfurnished">Unfurnished</option>
+            </select>
+            <input type="text" id="property_age" placeholder="Property Age *" required
+                class="w-full p-2 border rounded">
+        </div>
+
+        <div class="flex gap-3 mb-3">
+            <select id="facing" class="w-full p-2 border rounded">
+                <option value="">Facing</option>
+                <option value="North">North</option>
+                <option value="South">South</option>
+                <option value="East">East</option>
+                <option value="West">West</option>
+                <option value="North-East">North-East</option>
+                <option value="North-West">North-West</option>
+                <option value="South-East">South-East</option>
+                <option value="South-West">South-West</option>
+            </select>
+            <select id="ownership_type" class="w-full p-2 border rounded">
+                <option value="">Ownership Type</option>
+                <option value="Freehold">Freehold</option>
+                <option value="Leasehold">Leasehold</option>
+                <option value="Co-operative">Co-operative</option>
+                <option value="Power of Attorney">Power of Attorney</option>
+            </select>
+        </div>
+
+        <div class="flex gap-3 mb-3">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" id="parking">
+                <span class="text-sm text-gray-600">Parking Available</span>
+            </label>
+        </div>
+
+        <div class="mb-3">
+            <label class="block text-sm text-gray-600 mb-1">Availability Date</label>
+            <input type="date" id="availability_date"
+                class="w-full p-2 border rounded">
+        </div>
+
+        <textarea id="nearby_landmarks" placeholder="Nearby Landmarks (e.g. Near GNDU, 2km from Bus Stand)" rows="2"
+            class="w-full p-2 mb-3 border rounded"></textarea>
+
+        <!-- Images -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Images</h2>
+        <label class="block mb-2 text-sm text-gray-600">Upload Images (up to 5) — Hold Ctrl to select multiple</label>
+        <input type="file" id="images" multiple accept="image/*"
+            class="w-full mb-4">
+
+        <button type="submit"
+            class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+            Add Property
+        </button>
+    </form>
+
+    <p id="message" class="text-center mt-4 text-sm"></p>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+if (!token) window.location.href = '/public/login.html';
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/public/index.html';
+});
+
+document.getElementById('addPropertyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const messageEl = document.getElementById('message');
+    const formData = new FormData();
+
+    formData.append('title', document.getElementById('title').value);
+    formData.append('description', document.getElementById('description').value);
+    formData.append('price', document.getElementById('price').value);
+    formData.append('purpose', document.getElementById('purpose').value);
+    formData.append('negotiable_price', document.getElementById('negotiable_price').checked);
+    formData.append('location', document.getElementById('location').value);
+    formData.append('address', document.getElementById('address').value);
+    formData.append('property_type', document.getElementById('property_type').value);
+    formData.append('plot_size', document.getElementById('plot_size').value);
+    formData.append('built_up_area', document.getElementById('built_up_area').value);
+    formData.append('carpet_area', document.getElementById('carpet_area').value);
+    formData.append('floor_number', document.getElementById('floor_number').value);
+    formData.append('total_floors', document.getElementById('total_floors').value);
+    formData.append('bedrooms', document.getElementById('bedrooms').value);
+    formData.append('bathrooms', document.getElementById('bathrooms').value);
+    formData.append('balconies', document.getElementById('balconies').value);
+    formData.append('furnished_status', document.getElementById('furnished_status').value);
+    formData.append('property_age', document.getElementById('property_age').value);
+    formData.append('facing', document.getElementById('facing').value);
+    formData.append('ownership_type', document.getElementById('ownership_type').value);
+    formData.append('parking', document.getElementById('parking').checked);
+    formData.append('availability_date', document.getElementById('availability_date').value);
+    formData.append('nearby_landmarks', document.getElementById('nearby_landmarks').value);
+
+    const images = document.getElementById('images').files;
+    for (let i = 0; i < images.length; i++) {
+        formData.append('images', images[i]);
+    }
+
+    try {
+        const res = await fetch('http://localhost:3000/api/properties/add', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            messageEl.textContent = 'Property added successfully! Redirecting...';
+            messageEl.className = 'text-center mt-4 text-sm text-green-600';
+            setTimeout(() => window.location.href = '/public/dashboard.html', 1500);
+        } else {
+            messageEl.textContent = data.message;
+            messageEl.className = 'text-center mt-4 text-sm text-red-600';
+        }
+    } catch (error) {
+        messageEl.textContent = 'Something went wrong. Try again.';
+        messageEl.className = 'text-center mt-4 text-sm text-red-600';
+    }
+});
+</script>
+
+</body>
+</html>

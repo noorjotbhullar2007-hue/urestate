@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Urestate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+<div class="bg-white p-8 rounded-lg shadow-md w-96">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Login</h1>
+
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required
+            class="w-full p-2 mb-3 border rounded">
+
+        <input type="password" id="password" placeholder="Password" required
+            class="w-full p-2 mb-4 border rounded">
+
+        <button type="submit"
+            class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+            Login
+        </button>
+    </form>
+
+    <p id="message" class="text-center mt-4 text-sm"></p>
+
+    <p class="text-center mt-2 text-sm">
+        Don't have an account? <a href="/public/register.html" class="text-blue-600">Register</a>
+    </p>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const messageEl = document.getElementById('message');
+
+    try {
+        const res = await fetch('http://localhost:3000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            messageEl.textContent = 'Login successful! Redirecting...';
+            messageEl.className = 'text-center mt-4 text-sm text-green-600';
+            setTimeout(() => window.location.href = '/public/index.html', 1500);
+        } else {
+            messageEl.textContent = data.message;
+            messageEl.className = 'text-center mt-4 text-sm text-red-600';
+        }
+    } catch (error) {
+        messageEl.textContent = 'Something went wrong. Try again.';
+        messageEl.className = 'text-center mt-4 text-sm text-red-600';
+    }
+});
+</script>
+
+</body>
+</html>

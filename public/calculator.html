@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator - Urestate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Navbar -->
+<nav class="bg-white shadow p-4 flex justify-between items-center">
+    <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
+    <div class="space-x-4">
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600">Listings</a>
+        <a href="/public/login.html" class="text-gray-700 hover:text-blue-600">Login</a>
+    </div>
+</nav>
+
+<div class="max-w-3xl mx-auto p-6 mt-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">Property Calculator</h1>
+    <p class="text-gray-500 mb-6">Use our tools to make smarter property decisions</p>
+
+    <!-- Tabs -->
+    <div class="flex border-b mb-6">
+        <button id="emiTab" onclick="switchTab('emi')"
+            class="px-6 py-2 font-semibold text-blue-600 border-b-2 border-blue-600">
+            EMI Calculator
+        </button>
+        <button id="rvbTab" onclick="switchTab('rvb')"
+            class="px-6 py-2 font-semibold text-gray-500 hover:text-blue-600">
+            Rent vs Buy
+        </button>
+    </div>
+
+    <!-- EMI Calculator -->
+    <div id="emiSection">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4">Home Loan EMI Calculator</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Loan Amount (₹)</label>
+                    <input type="number" id="loanAmount" placeholder="e.g. 5000000"
+                        class="w-full p-2 border rounded" value="5000000">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Interest Rate (% per year)</label>
+                    <input type="number" id="interestRate" placeholder="e.g. 8.5" step="0.1"
+                        class="w-full p-2 border rounded" value="8.5">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Loan Duration (years)</label>
+                    <input type="number" id="loanYears" placeholder="e.g. 20"
+                        class="w-full p-2 border rounded" value="20">
+                </div>
+            </div>
+
+            <button onclick="calculateEMI()"
+                class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mb-6">
+                Calculate EMI
+            </button>
+
+            <div id="emiResult" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-500">Monthly EMI</p>
+                        <p class="text-2xl font-bold text-blue-600" id="monthlyEMI">-</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-500">Total Amount Paid</p>
+                        <p class="text-2xl font-bold text-green-600" id="totalAmount">-</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-500">Total Interest Paid</p>
+                        <p class="text-2xl font-bold text-red-600" id="totalInterest">-</p>
+                    </div>
+                </div>
+                <canvas id="emiChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rent vs Buy Calculator -->
+    <div id="rvbSection" class="hidden">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4">Rent vs Buy Calculator</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Property Price (₹)</label>
+                    <input type="number" id="propertyPrice" placeholder="e.g. 5000000"
+                        class="w-full p-2 border rounded" value="5000000">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Monthly Rent (₹)</label>
+                    <input type="number" id="monthlyRent" placeholder="e.g. 15000"
+                        class="w-full p-2 border rounded" value="15000">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Down Payment (₹)</label>
+                    <input type="number" id="downPayment" placeholder="e.g. 1000000"
+                        class="w-full p-2 border rounded" value="1000000">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Loan Interest Rate (%)</label>
+                    <input type="number" id="rvbInterest" placeholder="e.g. 8.5" step="0.1"
+                        class="w-full p-2 border rounded" value="8.5">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Years Planning to Stay</label>
+                    <input type="number" id="stayYears" placeholder="e.g. 10"
+                        class="w-full p-2 border rounded" value="10">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">Annual Rent Increase (%)</label>
+                    <input type="number" id="rentIncrease" placeholder="e.g. 5" step="0.1"
+                        class="w-full p-2 border rounded" value="5">
+                </div>
+            </div>
+
+            <button onclick="calculateRentVsBuy()"
+                class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mb-6">
+                Calculate
+            </button>
+
+            <div id="rvbResult" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-500">Total Cost of Buying</p>
+                        <p class="text-2xl font-bold text-blue-600" id="totalBuyCost">-</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg text-center">
+                        <p class="text-sm text-gray-500">Total Cost of Renting</p>
+                        <p class="text-2xl font-bold text-green-600" id="totalRentCost">-</p>
+                    </div>
+                </div>
+                <div id="rvbVerdict" class="p-4 rounded-lg text-center font-semibold text-lg mb-6"></div>
+                <canvas id="rvbChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let emiChartInstance = null;
+let rvbChartInstance = null;
+
+function switchTab(tab) {
+    if (tab === 'emi') {
+        document.getElementById('emiSection').classList.remove('hidden');
+        document.getElementById('rvbSection').classList.add('hidden');
+        document.getElementById('emiTab').className = 'px-6 py-2 font-semibold text-blue-600 border-b-2 border-blue-600';
+        document.getElementById('rvbTab').className = 'px-6 py-2 font-semibold text-gray-500 hover:text-blue-600';
+    } else {
+        document.getElementById('emiSection').classList.add('hidden');
+        document.getElementById('rvbSection').classList.remove('hidden');
+        document.getElementById('emiTab').className = 'px-6 py-2 font-semibold text-gray-500 hover:text-blue-600';
+        document.getElementById('rvbTab').className = 'px-6 py-2 font-semibold text-blue-600 border-b-2 border-blue-600';
+    }
+}
+
+function formatINR(amount) {
+    return '₹' + Math.round(amount).toLocaleString('en-IN');
+}
+
+function calculateEMI() {
+    const P = parseFloat(document.getElementById('loanAmount').value);
+    const annualRate = parseFloat(document.getElementById('interestRate').value);
+    const years = parseFloat(document.getElementById('loanYears').value);
+
+    if (!P || !annualRate || !years) {
+        alert('Please fill all fields');
+        return;
+    }
+
+    const r = annualRate / 12 / 100;
+    const n = years * 12;
+    const emi = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+    const totalAmount = emi * n;
+    const totalInterest = totalAmount - P;
+
+    document.getElementById('monthlyEMI').textContent = formatINR(emi);
+    document.getElementById('totalAmount').textContent = formatINR(totalAmount);
+    document.getElementById('totalInterest').textContent = formatINR(totalInterest);
+    document.getElementById('emiResult').classList.remove('hidden');
+
+    if (emiChartInstance) emiChartInstance.destroy();
+    emiChartInstance = new Chart(document.getElementById('emiChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Principal', 'Interest'],
+            datasets: [{
+                data: [P, totalInterest],
+                backgroundColor: ['#3b82f6', '#ef4444']
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+}
+
+function calculateRentVsBuy() {
+    const propertyPrice = parseFloat(document.getElementById('propertyPrice').value);
+    const monthlyRent = parseFloat(document.getElementById('monthlyRent').value);
+    const downPayment = parseFloat(document.getElementById('downPayment').value);
+    const annualRate = parseFloat(document.getElementById('rvbInterest').value);
+    const years = parseFloat(document.getElementById('stayYears').value);
+    const rentIncrease = parseFloat(document.getElementById('rentIncrease').value) / 100;
+
+    if (!propertyPrice || !monthlyRent || !downPayment || !annualRate || !years) {
+        alert('Please fill all fields');
+        return;
+    }
+
+    const loanAmount = propertyPrice - downPayment;
+    const r = annualRate / 12 / 100;
+    const n = years * 12;
+    const emi = loanAmount * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+    const totalBuyCost = downPayment + (emi * n);
+
+    let totalRentCost = 0;
+    let currentRent = monthlyRent;
+    for (let y = 0; y < years; y++) {
+        totalRentCost += currentRent * 12;
+        currentRent *= (1 + rentIncrease);
+    }
+
+    document.getElementById('totalBuyCost').textContent = formatINR(totalBuyCost);
+    document.getElementById('totalRentCost').textContent = formatINR(totalRentCost);
+
+    const verdictEl = document.getElementById('rvbVerdict');
+    if (totalBuyCost < totalRentCost) {
+        verdictEl.textContent = '🏠 Buying is cheaper by ' + formatINR(totalRentCost - totalBuyCost) + ' over ' + years + ' years!';
+        verdictEl.className = 'p-4 rounded-lg text-center font-semibold text-lg mb-6 bg-blue-50 text-blue-700';
+    } else {
+        verdictEl.textContent = '🏡 Renting is cheaper by ' + formatINR(totalBuyCost - totalRentCost) + ' over ' + years + ' years!';
+        verdictEl.className = 'p-4 rounded-lg text-center font-semibold text-lg mb-6 bg-green-50 text-green-700';
+    }
+
+    document.getElementById('rvbResult').classList.remove('hidden');
+
+    if (rvbChartInstance) rvbChartInstance.destroy();
+    rvbChartInstance = new Chart(document.getElementById('rvbChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Total Cost of Buying', 'Total Cost of Renting'],
+            datasets: [{
+                label: 'Amount (₹)',
+                data: [totalBuyCost, totalRentCost],
+                backgroundColor: ['#3b82f6', '#22c55e']
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+</script>
+
+</body>
+</html>
