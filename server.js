@@ -4,6 +4,7 @@ const path = require('path');
 const db = require('./config/db');
 const authRoutes = require('./routes/auth');
 const propertyRoutes = require('./routes/properties');
+const messageRoutes = require('./routes/messages');
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Test route
 app.get('/', (req, res) => {

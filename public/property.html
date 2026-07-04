@@ -61,6 +61,7 @@ async function loadPropertyDetails() {
             return;
         }
         const p = await res.json();
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
         const imagesHtml = (p.images && p.images.length > 0)
             ? p.images.map(img => `<img src="http://localhost:3000/${img.replace(/\\/g,'/')}" class="w-full h-64 object-cover rounded mb-2">`).join('')
@@ -94,7 +95,7 @@ async function loadPropertyDetails() {
                 ${p.bedrooms ? `<div class="text-center"><p class="text-2xl font-bold text-gray-800">${p.bedrooms}</p><p class="text-gray-500 text-sm">Bedrooms</p></div>` : ''}
                 ${p.bathrooms ? `<div class="text-center"><p class="text-2xl font-bold text-gray-800">${p.bathrooms}</p><p class="text-gray-500 text-sm">Bathrooms</p></div>` : ''}
                 ${p.balconies ? `<div class="text-center"><p class="text-2xl font-bold text-gray-800">${p.balconies}</p><p class="text-gray-500 text-sm">Balconies</p></div>` : ''}
-                ${p.floor_number ? `<div class="text-center"><p class="text-2xl font-bold text="gray-800">${p.floor_number}/${p.total_floors || '?'}</p><p class="text-gray-500 text-sm">Floor</p></div>` : ''}
+                ${p.floor_number ? `<div class="text-center"><p class="text-2xl font-bold text-gray-800">${p.floor_number}/${p.total_floors || '?'}</p><p class="text-gray-500 text-sm">Floor</p></div>` : ''}
             </div>
 
             <!-- Size Details -->
@@ -135,9 +136,72 @@ async function loadPropertyDetails() {
 
             <!-- Posted date -->
             <p class="text-gray-400 text-sm mt-6">Posted on: ${new Date(p.created_at).toLocaleDateString()}</p>
+
+            <!-- Contact Owner -->
+            ${token && currentUser.id !== p.user_id ? `
+            <div class="mt-6 border-t pt-6">
+                <h2 class="text-lg font-semibold text-gray-700 mb-3">Contact Owner</h2>
+                ${p.owner_phone ? `<p class="text-gray-600 mb-3">📞 <span class="font-semibold">${p.owner_phone}</span></p>` : ''}
+                <textarea id="messageText" rows="3" placeholder="Write your message here..."
+                    class="w-full p-2 border rounded mb-3"></textarea>
+                <button onclick="sendMessage(${p.id}, ${p.user_id})"
+                    class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                    Send Message
+                </button>
+                <p id="msgStatus" class="text-sm mt-2"></p>
+            </div>
+            ` : ''}
+
+            <!-- Not logged in -->
+            ${!token ? `
+            <div class="mt-6 border-t pt-6">
+                <p class="text-gray-500">Please <a href="/public/login.html" class="text-blue-600">login</a> to contact the owner.</p>
+            </div>
+            ` : ''}
         `;
+
     } catch (error) {
         container.innerHTML = '<p class="text-red-500">Error loading property.</p>';
+    }
+}
+
+async function sendMessage(propertyId, ownerId) {
+    const message = document.getElementById('messageText').value;
+    const msgStatus = document.getElementById('msgStatus');
+
+    if (!message.trim()) {
+        msgStatus.textContent = 'Please write a message first.';
+        msgStatus.className = 'text-sm mt-2 text-red-600';
+        return;
+    }
+
+    try {
+        const res = await fetch('http://localhost:3000/api/messages/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                property_id: propertyId,
+                receiver_id: ownerId,
+                message: message
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            msgStatus.textContent = '✅ Message sent successfully!';
+            msgStatus.className = 'text-sm mt-2 text-green-600';
+            document.getElementById('messageText').value = '';
+        } else {
+            msgStatus.textContent = data.message;
+            msgStatus.className = 'text-sm mt-2 text-red-600';
+        }
+    } catch (error) {
+        msgStatus.textContent = 'Something went wrong. Try again.';
+        msgStatus.className = 'text-sm mt-2 text-red-600';
     }
 }
 
