@@ -148,6 +148,19 @@
 
         <textarea id="nearby_landmarks" placeholder="Nearby Landmarks" rows="2"
             class="w-full p-2 mb-3 border rounded"></textarea>
+            <!-- GPS Location -->
+        <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">GPS Location (Optional)</h2>
+        <p class="text-sm text-gray-500 mb-3">Add your property's exact location. <a href="https://www.google.com/maps" target="_blank" class="text-blue-600">Open Google Maps</a>, right-click your property location and copy the coordinates.</p>
+        <div class="flex gap-3 mb-3">
+            <input type="number" id="latitude" placeholder="Latitude (e.g. 31.6340)" step="any"
+                class="w-full p-2 border rounded">
+            <input type="number" id="longitude" placeholder="Longitude (e.g. 74.8723)" step="any"
+                class="w-full p-2 border rounded">
+        </div>
+        <button type="button" id="detectLocation"
+            class="w-full border border-blue-600 text-blue-600 p-2 rounded hover:bg-blue-50 mb-3">
+            📍 Auto-detect My Location
+        </button>
 
         <button type="submit"
             class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
@@ -199,6 +212,8 @@ async function loadProperty() {
         document.getElementById('parking').checked = p.parking == 1;
         document.getElementById('availability_date').value = p.availability_date ? p.availability_date.split('T')[0] : '';
         document.getElementById('nearby_landmarks').value = p.nearby_landmarks || '';
+        document.getElementById('latitude').value = p.latitude || '';
+        document.getElementById('longitude').value = p.longitude || ''; 
     } catch (error) {
         document.getElementById('message').textContent = 'Error loading property details.';
     }
@@ -234,6 +249,8 @@ document.getElementById('editPropertyForm').addEventListener('submit', async (e)
     parking: document.getElementById('parking').checked,
     availability_date: document.getElementById('availability_date').value || null,
     nearby_landmarks: document.getElementById('nearby_landmarks').value || null
+    latitude: document.getElementById('latitude').value || null,
+    longitude: document.getElementById('longitude').value || null
 };
 
     try {
@@ -261,6 +278,23 @@ document.getElementById('editPropertyForm').addEventListener('submit', async (e)
         messageEl.className = 'text-center mt-4 text-sm text-red-600';
     }
 });
+        // Auto-detect location
+        document.getElementById('detectLocation').addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser');
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+                    document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+                    alert('✅ Location detected successfully!');
+                },
+                () => {
+                    alert('Unable to detect location. Please enter coordinates manually.');
+                }
+            );
+        });
 </script>
 
 </body>

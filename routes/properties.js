@@ -11,7 +11,7 @@ router.post('/add', protect, upload.array('images', 5), (req, res) => {
         negotiable_price, address, plot_size, built_up_area, carpet_area,
         floor_number, total_floors, bedrooms, bathrooms, balconies,
         parking, furnished_status, property_age, facing, ownership_type,
-        availability_date, nearby_landmarks
+        availability_date, nearby_landmarks, latitude, longitude
     } = req.body;
 
     const userId = req.userId;
@@ -25,16 +25,17 @@ router.post('/add', protect, upload.array('images', 5), (req, res) => {
         negotiable_price, address, plot_size, built_up_area, carpet_area,
         floor_number, total_floors, bedrooms, bathrooms, balconies,
         parking, furnished_status, property_age, facing, ownership_type,
-        availability_date, nearby_landmarks) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        availability_date, nearby_landmarks, latitude, longitude) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     db.query(sql, [
         userId, title, description, price, location, property_type, purpose,
-        negotiable_price === 'true' ? 1 : 0, address, plot_size, built_up_area, carpet_area,
-        floor_number, total_floors, bedrooms, bathrooms, balconies,
-        parking === 'true' ? 1 : 0, furnished_status, property_age, facing, ownership_type,
-        availability_date, nearby_landmarks
-    ], (err, result) => {
+        negotiable_price === 'true' ? 1 : 0, address || null, plot_size || null, built_up_area || null, carpet_area || null,
+        floor_number || null, total_floors || null, bedrooms, bathrooms, balconies || null,
+        parking === 'true' ? 1 : 0, furnished_status, property_age, facing || null, ownership_type || null,
+        availability_date || null, nearby_landmarks || null, latitude || null, longitude || null
+    ],
+     (err, result) => {
         if (err) return res.status(500).json({ message: 'Error adding property', error: err });
 
         const propertyId = result.insertId;
@@ -131,7 +132,7 @@ router.put('/:id', protect, (req, res) => {
         negotiable_price, address, plot_size, built_up_area, carpet_area,
         floor_number, total_floors, bedrooms, bathrooms, balconies,
         parking, furnished_status, property_age, facing, ownership_type,
-        availability_date, nearby_landmarks
+        availability_date, nearby_landmarks, latitude, longitude
     } = req.body;
 
     const checkSql = 'SELECT * FROM properties WHERE id = ?';
@@ -148,15 +149,15 @@ router.put('/:id', protect, (req, res) => {
             negotiable_price=?, address=?, plot_size=?, built_up_area=?, carpet_area=?,
             floor_number=?, total_floors=?, bedrooms=?, bathrooms=?, balconies=?,
             parking=?, furnished_status=?, property_age=?, facing=?, ownership_type=?,
-            availability_date=?, nearby_landmarks=?
+            availability_date=?, nearby_landmarks=?, latitude=?, longitude=?
             WHERE id=?`;
 
         db.query(updateSql, [
             title, description, price, location, property_type, purpose,
-            negotiable_price === 'true' ? 1 : 0, address, plot_size, built_up_area, carpet_area,
-            floor_number, total_floors, bedrooms, bathrooms, balconies,
-            parking === 'true' ? 1 : 0, furnished_status, property_age, facing, ownership_type,
-            availability_date, nearby_landmarks, propertyId
+            negotiable_price === 'true' ? 1 : 0, address, plot_size || null, built_up_area || null, carpet_area || null,
+            floor_number || null, total_floors || null, bedrooms, bathrooms, balconies || null,
+            parking === 'true' ? 1 : 0, furnished_status, property_age, facing || null, ownership_type || null,
+            availability_date || null, nearby_landmarks || null, latitude || null, longitude || null, propertyId
         ], (updateErr) => {
             if (updateErr) return res.status(500).json({ message: 'Error updating property', error: updateErr });
             res.json({ message: 'Property updated successfully!' });

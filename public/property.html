@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Property Details - Urestate</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
 
@@ -48,19 +50,21 @@ const params = new URLSearchParams(window.location.search);
 const propertyId = params.get('id');
 
 async function loadPropertyDetails() {
+    return new Promise(async (resolve) => {
     const container = document.getElementById('propertyDetail');
     if (!propertyId) {
         container.innerHTML = '<p class="text-red-500">No property selected.</p>';
-        return;
+        return resolve();
     }
 
     try {
         const res = await fetch(`http://localhost:3000/api/properties/${propertyId}`);
         if (!res.ok) {
             container.innerHTML = '<p class="text-red-500">Property not found.</p>';
-            return;
+            return resolve();
         }
         const p = await res.json();
+        window.currentProperty = p;
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
         const imagesHtml = (p.images && p.images.length > 0)
@@ -134,6 +138,13 @@ async function loadPropertyDetails() {
                 <p class="text-gray-600">${p.nearby_landmarks}</p>
             </div>` : ''}
 
+            <!-- Map -->
+            ${p.latitude && p.longitude ? `
+            <div class="mt-6">
+                <h2 class="text-lg font-semibold text-gray-700 mb-3">Property Location</h2>
+                <div id="propertyMap" style="height: 350px; border-radius: 8px;"></div>
+            </div>` : ''}
+
             <!-- Posted date -->
             <p class="text-gray-400 text-sm mt-6">Posted on: ${new Date(p.created_at).toLocaleDateString()}</p>
 
@@ -160,9 +171,12 @@ async function loadPropertyDetails() {
             ` : ''}
         `;
 
+        resolve();
     } catch (error) {
         container.innerHTML = '<p class="text-red-500">Error loading property.</p>';
+        resolve();
     }
+    });
 }
 
 async function sendMessage(propertyId, ownerId) {
@@ -205,7 +219,19 @@ async function sendMessage(propertyId, ownerId) {
     }
 }
 
-loadPropertyDetails();
+loadPropertyDetails().then(() => {
+    const p = window.currentProperty;
+    if (p && p.latitude && p.longitude) {
+        const map = L.map('propertyMap').setView([p.latitude, p.longitude], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        L.marker([p.latitude, p.longitude])
+            .addTo(map)
+            .bindPopup(`<b>${p.title}</b><br>₹${Number(p.price).toLocaleString()}`)
+            .openPopup();
+    }
+});
 </script>
 
 </body>
