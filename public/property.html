@@ -11,9 +11,18 @@
 <body class="bg-gray-50 min-h-screen">
 
 <!-- Navbar -->
-<nav class="bg-white shadow p-4 flex justify-between items-center">
-    <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
-    <div id="navLinks" class="space-x-4"></div>
+<nav class="bg-white shadow p-4">
+    <div class="flex justify-between items-center">
+        <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
+        <button id="menuBtn" class="md:hidden text-gray-700 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+        <div id="navLinks" class="hidden md:flex space-x-4"></div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden mt-3 flex-col space-y-2"></div>
 </nav>
 
 <div class="max-w-4xl mx-auto p-4 mt-6">
@@ -24,27 +33,41 @@
 </div>
 
 <script>
-const navLinks = document.getElementById('navLinks');
 const token = localStorage.getItem('token');
 
 if (token) {
-    navLinks.innerHTML = `
-        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600">Calculator</a>
-        <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600">Add Property</a>
-        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600">My Dashboard</a>
-        <button id="logoutBtn" class="text-red-600 hover:underline">Logout</button>
+    const links = `
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
+        <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600 block md:inline">Add Property</a>
+        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600 block md:inline">My Dashboard</a>
+        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
+        <button id="logoutBtn" class="text-red-600 hover:underline block md:inline text-left">Logout</button>
     `;
+    document.getElementById('navLinks').innerHTML = links;
+    document.getElementById('mobileMenu').innerHTML = links;
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/public/index.html';
     });
 } else {
-    navLinks.innerHTML = `
-        <a href="/public/login.html" class="text-gray-700 hover:text-blue-600">Login</a>
-        <a href="/public/register.html" class="text-blue-600 font-semibold">Register</a>
+    const links = `
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
+        <a href="/public/login.html" class="text-gray-700 hover:text-blue-600 block md:inline">Login</a>
+        <a href="/public/register.html" class="text-blue-600 font-semibold block md:inline">Register</a>
+        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
     `;
+    document.getElementById('navLinks').innerHTML = links;
+    document.getElementById('mobileMenu').innerHTML = links;
 }
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('hidden');
+    menu.classList.toggle('flex');
+});
 
 const params = new URLSearchParams(window.location.search);
 const propertyId = params.get('id');
@@ -68,8 +91,40 @@ async function loadPropertyDetails() {
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
         const imagesHtml = (p.images && p.images.length > 0)
-            ? p.images.map(img => `<img src="http://localhost:3000/${img.replace(/\\/g,'/')}" class="w-full h-64 object-cover rounded mb-2">`).join('')
-            : '<div class="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-400 rounded">No Image</div>';
+    ? `
+    <div class="relative w-full h-72 bg-gray-200 rounded overflow-hidden mb-2">
+        <!-- Images -->
+        ${p.images.map((img, index) => `
+            <img src="http://localhost:3000/${img.replace(/\\/g,'/')}" 
+                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0'}"
+                data-index="${index}">
+        `).join('')}
+
+        <!-- Left Arrow -->
+        ${p.images.length > 1 ? `
+        <button onclick="changeImage(-1)" 
+            class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-opacity-75 text-lg">
+            &#8249;
+        </button>
+
+        <!-- Right Arrow -->
+        <button onclick="changeImage(1)" 
+            class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-opacity-75 text-lg">
+            &#8250;
+        </button>
+
+        <!-- Dots -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            ${p.images.map((_, index) => `
+                <div class="w-2 h-2 rounded-full ${index === 0 ? 'bg-white' : 'bg-white bg-opacity-50'}" 
+                    data-dot="${index}">
+                </div>
+            `).join('')}
+        </div>
+        ` : ''}
+    </div>
+    `
+    : '<div class="w-full h-72 bg-gray-200 flex items-center justify-center text-gray-400 rounded">No Image</div>';
 
         container.innerHTML = `
             ${imagesHtml}
@@ -218,7 +273,28 @@ async function sendMessage(propertyId, ownerId) {
         msgStatus.className = 'text-sm mt-2 text-red-600';
     }
 }
+let currentImageIndex = 0;
 
+function changeImage(direction) {
+    const images = document.querySelectorAll('[data-index]');
+    const dots = document.querySelectorAll('[data-dot]');
+    const total = images.length;
+
+    // Hide current image
+    images[currentImageIndex].classList.remove('opacity-100');
+    images[currentImageIndex].classList.add('opacity-0');
+    dots[currentImageIndex].classList.remove('bg-white');
+    dots[currentImageIndex].classList.add('bg-opacity-50');
+
+    // Calculate next index
+    currentImageIndex = (currentImageIndex + direction + total) % total;
+
+    // Show new image
+    images[currentImageIndex].classList.remove('opacity-0');
+    images[currentImageIndex].classList.add('opacity-100');
+    dots[currentImageIndex].classList.add('bg-white');
+    dots[currentImageIndex].classList.remove('bg-opacity-50');
+}
 loadPropertyDetails().then(() => {
     const p = window.currentProperty;
     if (p && p.latitude && p.longitude) {

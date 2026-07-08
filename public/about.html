@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us - Urestate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Navbar -->
+<nav class="bg-white shadow p-4">
+    <div class="flex justify-between items-center">
+        <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
+        <button id="menuBtn" class="md:hidden text-gray-700 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+        <div id="navLinks" class="hidden md:flex space-x-4"></div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden mt-3 flex-col space-y-2"></div>
+</nav>
+
+<!-- Hero Section -->
+<div class="bg-blue-600 text-white py-16 px-4 text-center">
+    <h1 class="text-4xl font-bold mb-4">About Urestate</h1>
+    <p class="text-xl max-w-2xl mx-auto text-blue-100">
+        Your trusted platform for buying, selling and renting properties across India
+    </p>
+</div>
+
+<!-- Mission Section -->
+<div class="max-w-4xl mx-auto p-8 mt-8">
+    <div class="bg-white rounded-lg shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Our Mission</h2>
+        <p class="text-gray-600 leading-relaxed">
+            <!-- Fill this in -->
+           Our mission is to connect buyers and sellers, making real estate transactions simple, transparent, and accessible for everyone.
+        </p>
+    </div>
+
+    <!-- Our Story -->
+    <div class="bg-white rounded-lg shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Our Story</h2>
+        <p class="text-gray-600 leading-relaxed">
+            <!-- Fill this in -->
+          Built by a student who is still learning. If you encounter any issues or have suggestions for improvement, please feel free to contact us.
+        </p>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="bg-white rounded-lg shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Choose Urestate?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+            <div class="text-center p-4">
+                <div class="text-4xl mb-3">🏠</div>
+                <h3 class="font-semibold text-gray-800 mb-2">Wide Listings</h3>
+                <p class="text-gray-500 text-sm">
+                    <!-- Fill this in -->
+                    
+                </p>
+            </div>
+            <div class="text-center p-4">
+                <div class="text-4xl mb-3">🔒</div>
+                <h3 class="font-semibold text-gray-800 mb-2">Trusted & Secure</h3>
+                <p class="text-gray-500 text-sm">
+                    <!-- Fill this in -->
+                    
+                </p>
+            </div>
+            <div class="text-center p-4">
+                <div class="text-4xl mb-3">💬</div>
+                <h3 class="font-semibold text-gray-800 mb-2">Direct Communication</h3>
+                <p class="text-gray-500 text-sm">
+                    <!-- Fill this in -->
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div class="bg-white rounded-lg shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Our Team</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-2xl">
+                    👤
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800">Noorjot Singh Bhullar</h3>
+                    <p class="text-gray-500 text-sm">Founder & Developer</p>
+                    <p class="text-gray-400 text-sm">
+                        <!-- Fill this in -->
+                        Management Student | Dreaming Big
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="bg-white rounded-lg shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Contact Us</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">📧</span>
+                <div>
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p class="font-semibold text-gray-800">urestateofficial@gmail.com</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">📞</span>
+                <div>
+                    <p class="text-sm text-gray-500">Phone</p>
+                    <p class="font-semibold text-gray-800">+91 XXXXXXXXXX</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">📍</span>
+                <div>
+                    <p class="text-sm text-gray-500">Location</p>
+                    <p class="font-semibold text-gray-800">Amritsar, Punjab</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-white border-t mt-8 p-6 text-center text-gray-500 text-sm">
+    © 2026 Urestate. All rights reserved.
+</footer>
+
+<script>
+const token = localStorage.getItem('token');
+
+if (token) {
+    const links = `
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
+        <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600 block md:inline">Add Property</a>
+        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600 block md:inline">My Dashboard</a>
+        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
+        <button id="logoutBtn" class="text-red-600 hover:underline block md:inline text-left">Logout</button>
+    `;
+    document.getElementById('navLinks').innerHTML = links;
+    document.getElementById('mobileMenu').innerHTML = links;
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/public/index.html';
+    });
+} else {
+    const links = `
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
+        <a href="/public/login.html" class="text-gray-700 hover:text-blue-600 block md:inline">Login</a>
+        <a href="/public/register.html" class="text-blue-600 font-semibold block md:inline">Register</a>
+    `;
+    document.getElementById('navLinks').innerHTML = links;
+    document.getElementById('mobileMenu').innerHTML = links;
+}
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('hidden');
+    menu.classList.toggle('flex');
+});
+</script>
+
+</body>
+</html>

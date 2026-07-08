@@ -16,8 +16,15 @@ router.post('/add', protect, upload.array('images', 5), (req, res) => {
 
     const userId = req.userId;
 
-    if (!title || !price || !location || !purpose || !bedrooms || !bathrooms || !furnished_status || !property_age) {
-        return res.status(400).json({ message: 'Please fill all required fields' });
+    if (!title || !price || !location || !purpose || !furnished_status || !property_age) {
+    return res.status(400).json({ 
+        message: 'Please fill all required fields',
+        missing: { title: !title, price: !price, location: !location, purpose: !purpose, furnished_status: !furnished_status, property_age: !property_age }
+    });
+}
+    const isCommercialOrPlot = property_type === 'Commercial' || property_type === 'Plot';
+    if (!isCommercialOrPlot && (!bedrooms || !bathrooms)) {
+        return res.status(400).json({ message: 'Please fill in Bedrooms and Bathrooms' });
     }
 
     const sql = `INSERT INTO properties 
@@ -31,7 +38,7 @@ router.post('/add', protect, upload.array('images', 5), (req, res) => {
     db.query(sql, [
         userId, title, description, price, location, property_type, purpose,
         negotiable_price === 'true' ? 1 : 0, address || null, plot_size || null, built_up_area || null, carpet_area || null,
-        floor_number || null, total_floors || null, bedrooms, bathrooms, balconies || null,
+        floor_number || null, total_floors || null, bedrooms || null, bathrooms || null, balconies || null,
         parking === 'true' ? 1 : 0, furnished_status, property_age, facing || null, ownership_type || null,
         availability_date || null, nearby_landmarks || null, latitude || null, longitude || null
     ],
@@ -95,7 +102,7 @@ router.get('/', (req, res) => {
         sql += ' AND furnished_status = ?';
         params.push(furnished_status);
     }
-
+    sql += ' ORDER BY p.created_at DESC';
     db.query(sql, params, (err, results) => {
         if (err) return res.status(500).json({ message: 'Error fetching properties', error: err });
         res.json(results);

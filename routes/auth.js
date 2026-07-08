@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 const jwt = require('jsonwebtoken');
+const protect = require('../middleware/authMiddleware');
 
 // REGISTER API
 router.post('/register', async (req, res) => {
@@ -54,6 +55,15 @@ router.post('/login', (req, res) => {
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         res.json({ message: 'Login successful!', token, user: { id: user.id, name: user.name, email: user.email } });
+    });
+});
+// GET PROFILE
+router.get('/profile', protect, (req, res) => {
+    const sql = 'SELECT id, name, email, phone, created_at FROM users WHERE id = ?';
+    db.query(sql, [req.userId], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Server error', error: err });
+        if (results.length === 0) return res.status(404).json({ message: 'User not found' });
+        res.json(results[0]);
     });
 });
 module.exports = router;

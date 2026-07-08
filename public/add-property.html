@@ -9,13 +9,18 @@
 <body class="bg-gray-50 min-h-screen">
 
 <!-- Navbar -->
-<nav class="bg-white shadow p-4 flex justify-between items-center">
-    <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
-    <div class="space-x-4">
-        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600">My Dashboard</a>
-        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600">Calculator</a>
-        <button id="logoutBtn" class="text-red-600 hover:underline">Logout</button>
+<nav class="bg-white shadow p-4">
+    <div class="flex justify-between items-center">
+        <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
+        <button id="menuBtn" class="md:hidden text-gray-700 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+        <div id="navLinks" class="hidden md:flex space-x-4"></div>
     </div>
+    <div id="mobileMenu" class="hidden md:hidden mt-3 flex-col space-y-2"></div>
 </nav>
 
 <div class="max-w-2xl mx-auto p-6 mt-6 bg-white rounded-lg shadow">
@@ -88,11 +93,12 @@
 
         <!-- Room Details -->
         <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Room Details</h2>
+        <p class="text-sm text-gray-400 mb-3">Required for Flat/House. Optional for Plot/Commercial.</p>
 
         <div class="flex gap-3 mb-3">
-            <input type="number" id="bedrooms" placeholder="Bedrooms *" required
+            <input type="number" id="bedrooms" placeholder="Bedrooms"
                 class="w-full p-2 border rounded">
-            <input type="number" id="bathrooms" placeholder="Bathrooms *" required
+            <input type="number" id="bathrooms" placeholder="Bathrooms"
                 class="w-full p-2 border rounded">
             <input type="number" id="balconies" placeholder="Balconies"
                 class="w-full p-2 border rounded">
@@ -148,6 +154,7 @@
 
         <textarea id="nearby_landmarks" placeholder="Nearby Landmarks (e.g. Near GNDU, 2km from Bus Stand)" rows="2"
             class="w-full p-2 mb-3 border rounded"></textarea>
+
         <!-- GPS Location -->
         <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">GPS Location (Optional)</h2>
         <p class="text-sm text-gray-500 mb-3">Add your property's exact location on the map. <a href="https://www.google.com/maps" target="_blank" class="text-blue-600">Open Google Maps</a>, right-click your property location and copy the coordinates.</p>
@@ -161,6 +168,7 @@
             class="w-full border border-blue-600 text-blue-600 p-2 rounded hover:bg-blue-50 mb-3">
             📍 Auto-detect My Location
         </button>
+
         <!-- Images -->
         <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Images</h2>
         <label class="block mb-2 text-sm text-gray-600">Upload Images (up to 5) — Hold Ctrl to select multiple</label>
@@ -178,19 +186,54 @@
 
 <script>
 const token = localStorage.getItem('token');
+
+// Redirect if not logged in
 if (!token) window.location.href = '/public/login.html';
 
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/public/index.html';
+// Navbar
+if (token) {
+    const links = `
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
+        <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600 block md:inline">Add Property</a>
+        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600 block md:inline">My Dashboard</a>
+        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
+        <button id="logoutBtn" class="text-red-600 hover:underline block md:inline text-left">Logout</button>
+    `;
+    document.getElementById('navLinks').innerHTML = links;
+    document.getElementById('mobileMenu').innerHTML = links;
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/public/index.html';
+    });
+}
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('hidden');
+    menu.classList.toggle('flex');
 });
 
+// Add Property Form
 document.getElementById('addPropertyForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const messageEl = document.getElementById('message');
-    const formData = new FormData();
 
+    // Validate bedrooms/bathrooms for non-commercial/plot properties
+    const propertyType = document.getElementById('property_type').value;
+    const bedrooms = document.getElementById('bedrooms').value;
+    const bathrooms = document.getElementById('bathrooms').value;
+
+    if (propertyType !== 'Commercial' && propertyType !== 'Plot') {
+        if (!bedrooms || !bathrooms) {
+            messageEl.textContent = 'Please fill in Bedrooms and Bathrooms for this property type.';
+            messageEl.className = 'text-center mt-4 text-sm text-red-600';
+            return;
+        }
+    }
+
+    const formData = new FormData();
     formData.append('title', document.getElementById('title').value);
     formData.append('description', document.getElementById('description').value);
     formData.append('price', document.getElementById('price').value);
@@ -215,7 +258,7 @@ document.getElementById('addPropertyForm').addEventListener('submit', async (e) 
     formData.append('availability_date', document.getElementById('availability_date').value);
     formData.append('nearby_landmarks', document.getElementById('nearby_landmarks').value);
     formData.append('latitude', document.getElementById('latitude').value);
-    formData.append('longitude', document.getElementById('longitude').value);   
+    formData.append('longitude', document.getElementById('longitude').value);
 
     const images = document.getElementById('images').files;
     for (let i = 0; i < images.length; i++) {
@@ -244,23 +287,24 @@ document.getElementById('addPropertyForm').addEventListener('submit', async (e) 
         messageEl.className = 'text-center mt-4 text-sm text-red-600';
     }
 });
-    // Auto-detect location
-    document.getElementById('detectLocation').addEventListener('click', () => {
-        if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser');
-            return;
+
+// Auto-detect location
+document.getElementById('detectLocation').addEventListener('click', () => {
+    if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser');
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+            document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+            alert('✅ Location detected successfully!');
+        },
+        () => {
+            alert('Unable to detect location. Please enter coordinates manually.');
         }
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
-                document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
-                alert('✅ Location detected successfully!');
-            },
-            () => {
-                alert('Unable to detect location. Please enter coordinates manually.');
-            }
-        );
-    });
+    );
+});
 </script>
 
 </body>
