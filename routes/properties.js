@@ -113,7 +113,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
     const propertyId = req.params.id;
 
-    const sql = `SELECT p.*, u.phone as owner_phone FROM properties p JOIN users u ON p.user_id = u.id WHERE p.id = ?`;
+    const sql = `SELECT p.*, u.phone as owner_phone, u.name as owner_name, u.email as owner_email FROM properties p JOIN users u ON p.user_id = u.id WHERE p.id = ?`;
     db.query(sql, [propertyId], (err, results) => {
         if (err) return res.status(500).json({ message: 'Error fetching property', error: err });
         if (results.length === 0) return res.status(404).json({ message: 'Property not found' });

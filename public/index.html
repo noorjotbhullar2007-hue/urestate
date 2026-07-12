@@ -172,6 +172,7 @@ document.getElementById('menuBtn').addEventListener('click', () => {
 
 // Fetch and display properties
 async function loadProperties(filters = '') {
+    return new Promise(async (resolve) => {
     const propertyList = document.getElementById('propertyList');
     propertyList.innerHTML = '<p class="text-gray-500">Loading properties...</p>';
 
@@ -181,9 +182,10 @@ async function loadProperties(filters = '') {
     allPropertiesData = properties;
 
     if (properties.length === 0) {
-        propertyList.innerHTML = '<p class="text-gray-500">No properties found.</p>';
-        return;
-    }
+            propertyList.innerHTML = '<p class="text-gray-500">No properties found.</p>';
+            resolve();
+            return;
+        }
 
     propertyList.innerHTML = properties.map(p => `
             <a href="/public/property.html?id=${p.id}" class="block bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">
@@ -199,9 +201,12 @@ async function loadProperties(filters = '') {
                 </div>
             </a>
         `).join('');
-    } catch (error) {
+        resolve();
+   } catch (error) {
         propertyList.innerHTML = '<p class="text-red-500">Error loading properties.</p>';
+        resolve();
     }
+    });
 }
 
 loadProperties();
@@ -216,7 +221,6 @@ document.getElementById('moreFiltersBtn').addEventListener('click', () => {
         : 'More Filters <span id="filterBadge" class="hidden bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full ml-1">0</span>';
 });
 
-// Search button
 document.getElementById('searchBtn').addEventListener('click', () => {
     const location = document.getElementById('locationFilter').value;
     const purpose = document.getElementById('purposeFilter').value;
@@ -247,7 +251,12 @@ document.getElementById('searchBtn').addEventListener('click', () => {
         badge.classList.add('hidden');
     }
 
-    loadProperties('?' + params.toString());
+    loadProperties('?' + params.toString()).then(() => {
+        // If map view is active, refresh map with new filtered results
+        if (currentView === 'map') {
+            initMap();
+        }
+    });
 });
 
 // Clear Filters button
