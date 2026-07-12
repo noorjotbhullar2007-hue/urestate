@@ -22,7 +22,10 @@
             class="w-full p-2 mb-3 border rounded">
 
         <input type="text" id="phone" placeholder="Phone Number"
-            class="w-full p-2 mb-4 border rounded">
+    class="w-full p-2 mb-3 border rounded">
+
+    <input type="text" id="city" placeholder="City"
+        class="w-full p-2 mb-4 border rounded">
 
         <button type="submit"
             class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
@@ -47,11 +50,13 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     const phone = document.getElementById('phone').value;
     const messageEl = document.getElementById('message');
 
+    const city = document.getElementById('city').value;
+
     try {
         const res = await fetch('http://localhost:3000/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, phone })
+            body: JSON.stringify({ name, email, password, phone, city })
         });
 
         const data = await res.json();

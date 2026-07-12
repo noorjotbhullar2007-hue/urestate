@@ -7,7 +7,7 @@ const protect = require('../middleware/authMiddleware');
 
 // REGISTER API
 router.post('/register', async (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, city } = req.body;
 
     if (!name || !email || !password) {
         return res.status(400).json({ message: 'Please fill all required fields' });
@@ -17,8 +17,8 @@ router.post('/register', async (req, res) => {
         // Encrypt password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const sql = 'INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)';
-        db.query(sql, [name, email, hashedPassword, phone], (err, result) => {
+        const sql = 'INSERT INTO users (name, email, password, phone, city) VALUES (?, ?, ?, ?, ?)';
+        db.query(sql, [name, email, hashedPassword, phone, city], (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: 'Error registering user', error: err });
@@ -54,12 +54,12 @@ router.post('/login', (req, res) => {
 
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-        res.json({ message: 'Login successful!', token, user: { id: user.id, name: user.name, email: user.email } });
+       res.json({ message: 'Login successful!', token, user: { id: user.id, name: user.name, email: user.email, city: user.city } });
     });
 });
 // GET PROFILE
 router.get('/profile', protect, (req, res) => {
-    const sql = 'SELECT id, name, email, phone, created_at FROM users WHERE id = ?';
+    const sql = 'SELECT id, name, email, phone, city, created_at FROM users WHERE id = ?';
     db.query(sql, [req.userId], (err, results) => {
         if (err) return res.status(500).json({ message: 'Server error', error: err });
         if (results.length === 0) return res.status(404).json({ message: 'User not found' });

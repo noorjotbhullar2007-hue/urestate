@@ -28,8 +28,8 @@ router.get('/conversations', protect, (req, res) => {
     const userId = req.userId;
 
     const sql = `
-        SELECT m.*, 
-        u.name as sender_name, u.phone as sender_phone,
+       SELECT m.*, 
+        u.name as sender_name, u.phone as sender_phone, u.email as sender_email,
         p.title as property_title,
         (SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = FALSE) as unread_count
         FROM messages m
@@ -104,5 +104,13 @@ router.get('/unread', protect, (req, res) => {
         res.json(results[0]);
     });
 });
-
+// MARK ALL MESSAGES AS READ
+router.put('/conversations/read', protect, (req, res) => {
+    const userId = req.userId;
+    const sql = 'UPDATE messages SET is_read = TRUE WHERE receiver_id = ?';
+    db.query(sql, [userId], (err) => {
+        if (err) return res.status(500).json({ message: 'Error marking messages as read', error: err });
+        res.json({ message: 'All messages marked as read' });
+    });
+});
 module.exports = router;

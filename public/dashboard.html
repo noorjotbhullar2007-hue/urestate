@@ -19,25 +19,55 @@
             </svg>
         </button>
         <div class="hidden md:flex space-x-4">
-            <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
-            <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
-            <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600 block md:inline">Add Property</a>
-            <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600 block md:inline">My Dashboard</a>
-            <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
+            <a href="/public/index.html" class="text-gray-700 hover:text-blue-600">Listings</a>
+            <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600">Calculator</a>
+            <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600">Add Property</a>
+            <a href="/public/about.html" class="text-gray-700 hover:text-blue-600">About Us</a>
             <button id="logoutBtn" class="text-red-600 hover:underline">Logout</button>
         </div>
     </div>
     <div id="mobileMenu" class="hidden md:hidden mt-3 flex-col space-y-2">
-            <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
-            <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
-            <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600 block md:inline">Add Property</a>
-            <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600 block md:inline">My Dashboard</a>
-            <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block">Listings</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block">Calculator</a>
+        <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600 block">Add Property</a>
+        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block">About Us</a>
         <button id="logoutBtnMobile" class="text-red-600 hover:underline text-left">Logout</button>
     </div>
 </nav>
 
 <div class="max-w-6xl mx-auto p-4 mt-6">
+
+ <!-- Profile Card — Always visible at top -->
+<div id="topProfile" class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="flex items-center gap-4 mb-6">
+        <div id="profileAvatar" class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-2xl font-bold text-blue-600">
+            ?
+        </div>
+        <div>
+            <h2 id="profileName" class="text-xl font-bold text-gray-800">Loading...</h2>
+            <p id="profileMemberSince" class="text-gray-500 text-sm"></p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-gray-50 p-3 rounded">
+            <p class="text-sm text-gray-500">Full Name</p>
+            <p id="profileFullName" class="font-semibold text-gray-800">-</p>
+        </div>
+        <div class="bg-gray-50 p-3 rounded">
+            <p class="text-sm text-gray-500">Email</p>
+            <p id="profileEmail" class="font-semibold text-gray-800">-</p>
+        </div>
+        <div class="bg-gray-50 p-3 rounded">
+            <p class="text-sm text-gray-500">Phone</p>
+            <p id="profilePhone" class="font-semibold text-gray-800">-</p>
+        </div>
+        <div class="bg-gray-50 p-3 rounded">
+            <p class="text-sm text-gray-500">City</p>
+            <p id="profileCity" class="font-semibold text-gray-800">-</p>
+        </div>
+    </div>
+</div>
+
     <h1 class="text-2xl font-bold text-gray-800 mb-6">My Dashboard</h1>
 
     <!-- Tabs -->
@@ -54,10 +84,7 @@
             class="px-6 py-2 font-semibold text-gray-500 hover:text-blue-600">
             Sent
         </button>
-        <button id="profileTab" onclick="switchTab('profile')"
-            class="px-6 py-2 font-semibold text-gray-500 hover:text-blue-600">
-            My Profile
-        </button>
+        
     </div>
 
     <!-- My Listings Section -->
@@ -80,13 +107,9 @@
             <p class="text-gray-500">Loading sent messages...</p>
         </div>
     </div>
+
+  
 </div>
-    <!-- Profile Section -->
-    <div id="profileSection" class="hidden">
-        <div id="profileContent">
-            <p class="text-gray-500">Loading profile...</p>
-        </div>
-    </div>
 
 <script>
 const token = localStorage.getItem('token');
@@ -112,16 +135,17 @@ document.getElementById('menuBtn').addEventListener('click', () => {
     menu.classList.toggle('flex');
 });
 
+// Tab switching
 function switchTab(tab) {
     document.getElementById('listingsSection').classList.add('hidden');
     document.getElementById('messagesSection').classList.add('hidden');
     document.getElementById('sentSection').classList.add('hidden');
-    document.getElementById('profileSection').classList.add('hidden');
+   
 
     document.getElementById('listingsTab').className = 'px-6 py-2 font-semibold text-gray-500 hover:text-blue-600';
     document.getElementById('messagesTab').className = 'px-6 py-2 font-semibold text-gray-500 hover:text-blue-600';
     document.getElementById('sentTab').className = 'px-6 py-2 font-semibold text-gray-500 hover:text-blue-600';
-    document.getElementById('profileTab').className = 'px-6 py-2 font-semibold text-gray-500 hover:text-blue-600';
+    
 
     if (tab === 'listings') {
         document.getElementById('listingsSection').classList.remove('hidden');
@@ -134,12 +158,9 @@ function switchTab(tab) {
         document.getElementById('sentSection').classList.remove('hidden');
         document.getElementById('sentTab').className = 'px-6 py-2 font-semibold text-blue-600 border-b-2 border-blue-600';
         loadSentMessages();
-    } else if (tab === 'profile') {
-        document.getElementById('profileSection').classList.remove('hidden');
-        document.getElementById('profileTab').className = 'px-6 py-2 font-semibold text-blue-600 border-b-2 border-blue-600';
-        loadProfile();
-    }
+    } 
 }
+
 // Load unread count for badge
 async function loadUnreadCount() {
     try {
@@ -159,7 +180,26 @@ async function loadUnreadCount() {
     }
 }
 
-// Load received messages
+async function loadTopProfile() {
+    try {
+        const res = await fetch('http://localhost:3000/api/auth/profile', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const profile = await res.json();
+
+        document.getElementById('profileAvatar').textContent = profile.name.charAt(0).toUpperCase();
+        document.getElementById('profileName').textContent = profile.name;
+        document.getElementById('profileMemberSince').textContent = 'Member since ' + new Date(profile.created_at).toLocaleDateString();
+        document.getElementById('profileFullName').textContent = profile.name;
+        document.getElementById('profileEmail').textContent = profile.email;
+        document.getElementById('profilePhone').textContent = profile.phone || 'Not provided';
+        document.getElementById('profileCity').textContent = profile.city || 'Not provided';
+    } catch (error) {
+        console.error('Error loading top profile');
+    }
+}
+
+// Load received messages (4.3, 4.4)
 async function loadMessages() {
     const container = document.getElementById('messagesList');
     container.innerHTML = '<p class="text-gray-500">Loading messages...</p>';
@@ -181,7 +221,8 @@ async function loadMessages() {
                     <div>
                         <p class="font-semibold text-gray-800">${m.sender_name}</p>
                         ${m.sender_phone ? `<p class="text-sm text-gray-500">📞 ${m.sender_phone}</p>` : ''}
-                        <p class="text-sm text-blue-600">Re: ${m.property_title}</p>
+                        ${m.sender_email ? `<p class="text-sm text-gray-500">📧 ${m.sender_email}</p>` : ''}
+                        <p class="text-sm font-semibold text-blue-600 mt-1">🏠 ${m.property_title}</p>
                     </div>
                     <p class="text-xs text-gray-400">${new Date(m.created_at).toLocaleDateString()}</p>
                 </div>
@@ -202,8 +243,9 @@ async function loadMessages() {
             </div>
         `).join('');
 
-        // Mark all as read
-        await fetch('http://localhost:3000/api/messages/unread', {
+        // Mark all as read (4.3)
+        await fetch('http://localhost:3000/api/messages/conversations/read', {
+            method: 'PUT',
             headers: { 'Authorization': 'Bearer ' + token }
         });
         loadUnreadCount();
@@ -234,7 +276,7 @@ async function loadSentMessages() {
                 <div class="flex justify-between items-start mb-2">
                     <div>
                         <p class="font-semibold text-gray-800">To: ${m.receiver_name}</p>
-                        <p class="text-sm text-blue-600">Re: ${m.property_title}</p>
+                        <p class="text-sm font-semibold text-blue-600 mt-1">🏠 ${m.property_title}</p>
                     </div>
                     <p class="text-xs text-gray-400">${new Date(m.created_at).toLocaleDateString()}</p>
                 </div>
@@ -351,50 +393,13 @@ async function deleteProperty(id) {
     }
 }
 
+// Full profile tab
+
+
 // Initial load
 loadMyProperties();
 loadUnreadCount();
-async function loadProfile() {
-    const container = document.getElementById('profileContent');
-    container.innerHTML = '<p class="text-gray-500">Loading profile...</p>';
-
-    try {
-        const res = await fetch('http://localhost:3000/api/auth/profile', {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const profile = await res.json();
-
-        container.innerHTML = `
-            <div class="bg-white rounded-lg shadow p-6 max-w-lg">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-2xl font-bold text-blue-600">
-                        ${profile.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800">${profile.name}</h2>
-                        <p class="text-gray-500 text-sm">Member since ${new Date(profile.created_at).toLocaleDateString()}</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 gap-4">
-                    <div class="bg-gray-50 p-3 rounded">
-                        <p class="text-sm text-gray-500">Full Name</p>
-                        <p class="font-semibold text-gray-800">${profile.name}</p>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded">
-                        <p class="text-sm text-gray-500">Email</p>
-                        <p class="font-semibold text-gray-800">${profile.email}</p>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded">
-                        <p class="text-sm text-gray-500">Phone</p>
-                        <p class="font-semibold text-gray-800">${profile.phone || 'Not provided'}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-    } catch (error) {
-        container.innerHTML = '<p class="text-red-500">Error loading profile.</p>';
-    }
-}
+loadTopProfile();
 </script>
 
 </body>
