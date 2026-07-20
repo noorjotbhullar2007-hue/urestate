@@ -150,41 +150,45 @@
 </div>
 
 <script>
-    const token = localStorage.getItem('token');
-
-    if (token) {
-        const links = `
-            <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
-            <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
-            <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600 block md:inline">Add Property</a>
-            <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600 block md:inline">My Dashboard</a>
-            <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
-            <button id="logoutBtn" class="text-red-600 hover:underline block md:inline text-left">Logout</button>
-        `;
-        document.getElementById('navLinks').innerHTML = links;
-        document.getElementById('mobileMenu').innerHTML = links;
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/public/index.html';
-        });
-    } else {
-        const links = `
-            <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
-            <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
-            <a href="/public/login.html" class="text-gray-700 hover:text-blue-600 block md:inline">Login</a>
-            <a href="/public/register.html" class="text-blue-600 font-semibold block md:inline">Register</a>
-            <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
-        `;
-        document.getElementById('navLinks').innerHTML = links;
-        document.getElementById('mobileMenu').innerHTML = links;
+function logoutConfirm() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/public/index.html';
     }
+}
 
-    document.getElementById('menuBtn').addEventListener('click', () => {
-        const menu = document.getElementById('mobileMenu');
-        menu.classList.toggle('hidden');
-        menu.classList.toggle('flex');
-    });
+const token = localStorage.getItem('token');
+
+if (token) {
+    const links = `
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
+        <a href="/public/add-property.html" class="text-gray-700 hover:text-blue-600 block md:inline">Add Property</a>
+        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600 block md:inline">My Dashboard</a>
+        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
+        <button onclick="logoutConfirm()" class="text-red-600 hover:underline block md:inline text-left">Logout</button>
+    `;
+    document.getElementById('navLinks').innerHTML = links;
+    document.getElementById('mobileMenu').innerHTML = links;
+} else {
+    const links = `
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block md:inline">Listings</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
+        <a href="/public/login.html" class="text-gray-700 hover:text-blue-600 block md:inline">Login</a>
+        <a href="/public/register.html" class="text-blue-600 font-semibold block md:inline">Register</a>
+        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block md:inline">About Us</a>
+    `;
+    document.getElementById('navLinks').innerHTML = links;
+    document.getElementById('mobileMenu').innerHTML = links;
+}
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('hidden');
+    menu.classList.toggle('flex');
+});
+
 let emiChartInstance = null;
 let rvbChartInstance = null;
 

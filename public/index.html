@@ -127,6 +127,7 @@
 </div>
 
 <script>
+    
 const token = localStorage.getItem('token');
 
 if (token) {
@@ -140,19 +141,23 @@ if (token) {
     `;
     document.getElementById('navLinks').innerHTML = links;
     document.getElementById('mobileMenu').innerHTML = links;
-    document.getElementById('logoutBtn').addEventListener('click', () => {
+   document.getElementById('logoutBtn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to logout?')) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.reload();
-    });
-    // Mobile logout button
-    document.querySelectorAll('#logoutBtn').forEach(btn => {
-        btn.addEventListener('click', () => {
+    }
+});
+// Mobile logout button
+document.querySelectorAll('#logoutBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to logout?')) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.reload();
-        });
+        }
     });
+});
 } else {
     const links = `
         <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block md:inline">Calculator</a>
@@ -259,7 +264,6 @@ document.getElementById('searchBtn').addEventListener('click', () => {
     });
 });
 
-// Clear Filters button
 document.getElementById('clearBtn').addEventListener('click', () => {
     document.getElementById('locationFilter').value = '';
     document.getElementById('purposeFilter').value = '';
@@ -270,7 +274,11 @@ document.getElementById('clearBtn').addEventListener('click', () => {
     document.getElementById('bathroomsFilter').value = '';
     document.getElementById('furnishedFilter').value = '';
     document.getElementById('filterBadge').classList.add('hidden');
-    loadProperties();
+    loadProperties().then(() => {
+        if (currentView === 'map') {
+            initMap();
+        }
+    });
 });
 // Map view
 let mapInstance = null;

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const protect = require('../middleware/authMiddleware');
+const { sendMessageNotification } = require('../utils/email');
 
 // SEND MESSAGE (protected)
 router.post('/send', protect, (req, res) => {
@@ -19,6 +20,26 @@ router.post('/send', protect, (req, res) => {
     const sql = 'INSERT INTO messages (property_id, sender_id, receiver_id, message) VALUES (?, ?, ?, ?)';
     db.query(sql, [property_id, sender_id, receiver_id, message], (err, result) => {
         if (err) return res.status(500).json({ message: 'Error sending message', error: err });
+
+        // Fetch details for email notification
+        const detailsSql = `
+            SELECT 
+                u_owner.email as owner_email,
+                u_owner.name as owner_name,
+                u_sender.name as sender_name,
+                p.title as property_title
+            FROM users u_owner
+            JOIN users u_sender ON u_sender.id = ?
+            JOIN properties p ON p.id = ?
+            WHERE u_owner.id = ?
+        `;
+        db.query(detailsSql, [sender_id, property_id, receiver_id], async (detailsErr, details) => {
+            if (!detailsErr && details.length > 0) {
+                const { owner_email, owner_name, sender_name, property_title } = details[0];
+                await sendMessageNotification(owner_email, owner_name, sender_name, property_title, message);
+            }
+        });
+
         res.status(201).json({ message: 'Message sent successfully!' });
     });
 });
@@ -78,6 +99,26 @@ router.post('/reply', protect, (req, res) => {
     const sql = 'INSERT INTO messages (property_id, sender_id, receiver_id, message) VALUES (?, ?, ?, ?)';
     db.query(sql, [property_id, sender_id, receiver_id, message], (err, result) => {
         if (err) return res.status(500).json({ message: 'Error sending reply', error: err });
+
+        // Fetch details for email notification
+        const detailsSql = `
+            SELECT 
+                u_owner.email as owner_email,
+                u_owner.name as owner_name,
+                u_sender.name as sender_name,
+                p.title as property_title
+            FROM users u_owner
+            JOIN users u_sender ON u_sender.id = ?
+            JOIN properties p ON p.id = ?
+            WHERE u_owner.id = ?
+        `;
+        db.query(detailsSql, [sender_id, property_id, receiver_id], async (detailsErr, details) => {
+            if (!detailsErr && details.length > 0) {
+                const { owner_email, owner_name, sender_name, property_title } = details[0];
+                await sendMessageNotification(owner_email, owner_name, sender_name, property_title, message);
+            }
+        });
+
         res.status(201).json({ message: 'Reply sent successfully!' });
     });
 });

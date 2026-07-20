@@ -62,13 +62,18 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         const data = await res.json();
 
         if (res.ok) {
-            messageEl.textContent = data.message + ' Redirecting to login...';
-            messageEl.className = 'text-center mt-4 text-sm text-green-600';
-            setTimeout(() => window.location.href = '/public/login.html', 1500);
-        } else {
-            messageEl.textContent = data.message;
-            messageEl.className = 'text-center mt-4 text-sm text-red-600';
-        }
+    messageEl.textContent = data.message + ' Redirecting to login...';
+    messageEl.className = 'text-center mt-4 text-sm text-green-600';
+    setTimeout(() => window.location.href = '/public/login.html', 1500);
+} else {
+    // Show friendly error messages
+    let errorMsg = data.message;
+    if (data.error && data.error.code === 'ER_DUP_ENTRY') {
+        errorMsg = '❌ This email is already registered. Please login or use a different email.';
+    }
+    messageEl.textContent = errorMsg;
+    messageEl.className = 'text-center mt-4 text-sm text-red-600';
+}
     } catch (error) {
         messageEl.textContent = 'Something went wrong. Try again.';
         messageEl.className = 'text-center mt-4 text-sm text-red-600';

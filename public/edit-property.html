@@ -9,18 +9,53 @@
 <body class="bg-gray-50 min-h-screen">
 
 <!-- Navbar -->
-<nav class="bg-white shadow p-4 flex justify-between items-center">
-    <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
-    <div class="space-x-4">
-        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600">My Dashboard</a>
-        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600">Calculator</a>
-        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600">About Us</a>
-        <button id="logoutBtn" class="text-red-600 hover:underline">Logout</button>
+<nav class="bg-white shadow p-4">
+    <div class="flex justify-between items-center">
+        <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
+        <button id="menuBtn" class="md:hidden text-gray-700 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+        <div class="hidden md:flex space-x-4">
+            <a href="/public/index.html" class="text-gray-700 hover:text-blue-600">Listings</a>
+            <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600">My Dashboard</a>
+            <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600">Calculator</a>
+            <a href="/public/about.html" class="text-gray-700 hover:text-blue-600">About Us</a>
+            <button id="logoutBtn" class="text-red-600 hover:underline">Logout</button>
+        </div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden mt-3 flex-col space-y-2">
+        <a href="/public/index.html" class="text-gray-700 hover:text-blue-600 block">Listings</a>
+        <a href="/public/dashboard.html" class="text-gray-700 hover:text-blue-600 block">My Dashboard</a>
+        <a href="/public/calculator.html" class="text-gray-700 hover:text-blue-600 block">Calculator</a>
+        <a href="/public/about.html" class="text-gray-700 hover:text-blue-600 block">About Us</a>
+        <button id="logoutBtnMobile" class="text-red-600 hover:underline text-left">Logout</button>
     </div>
 </nav>
 
 <div class="max-w-2xl mx-auto p-6 mt-6 bg-white rounded-lg shadow">
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Edit Property</h1>
+
+    <!-- Current Images -->
+    <div id="currentImagesSection" class="hidden mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-3">Current Images</h2>
+        <div class="relative w-full h-48 bg-gray-100 rounded overflow-hidden">
+            <div id="currentImages"></div>
+            <button type="button" onclick="currentChangeImage(-1)"
+                class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-opacity-75 text-lg">
+                &#8249;
+            </button>
+            <button type="button" onclick="currentChangeImage(1)"
+                class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-opacity-75 text-lg">
+                &#8250;
+            </button>
+            <div id="currentImageCounter" class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                1/1
+            </div>
+        </div>
+    </div>
 
     <form id="editPropertyForm">
 
@@ -89,11 +124,12 @@
 
         <!-- Room Details -->
         <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Room Details</h2>
+        <p class="text-sm text-gray-400 mb-3">Required for Flat/House. Optional for Plot/Commercial.</p>
 
         <div class="flex gap-3 mb-3">
-            <input type="number" id="bedrooms" placeholder="Bedrooms *" required
+            <input type="number" id="bedrooms" placeholder="Bedrooms"
                 class="w-full p-2 border rounded">
-            <input type="number" id="bathrooms" placeholder="Bathrooms *" required
+            <input type="number" id="bathrooms" placeholder="Bathrooms"
                 class="w-full p-2 border rounded">
             <input type="number" id="balconies" placeholder="Balconies"
                 class="w-full p-2 border rounded">
@@ -149,7 +185,8 @@
 
         <textarea id="nearby_landmarks" placeholder="Nearby Landmarks" rows="2"
             class="w-full p-2 mb-3 border rounded"></textarea>
-            <!-- GPS Location -->
+
+        <!-- GPS Location -->
         <h2 class="text-lg font-semibold text-gray-700 mb-3 mt-4">GPS Location (Optional)</h2>
         <p class="text-sm text-gray-500 mb-3">Add your property's exact location. <a href="https://www.google.com/maps" target="_blank" class="text-blue-600">Open Google Maps</a>, right-click your property location and copy the coordinates.</p>
         <div class="flex gap-3 mb-3">
@@ -176,20 +213,46 @@
 const token = localStorage.getItem('token');
 if (!token) window.location.href = '/public/login.html';
 
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/public/index.html';
+// Logout
+function logoutConfirm() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/public/index.html';
+    }
+}
+document.getElementById('logoutBtn').addEventListener('click', logoutConfirm);
+document.getElementById('logoutBtnMobile').addEventListener('click', logoutConfirm);
+
+// Hamburger menu
+document.getElementById('menuBtn').addEventListener('click', () => {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('hidden');
+    menu.classList.toggle('flex');
 });
 
 const params = new URLSearchParams(window.location.search);
 const propertyId = params.get('id');
+
+// Current images carousel
+let currentImgIndex = 0;
+function currentChangeImage(direction) {
+    const images = document.querySelectorAll('[data-current-index]');
+    if (images.length === 0) return;
+    images[currentImgIndex].classList.remove('opacity-100');
+    images[currentImgIndex].classList.add('opacity-0');
+    currentImgIndex = (currentImgIndex + direction + images.length) % images.length;
+    images[currentImgIndex].classList.remove('opacity-0');
+    images[currentImgIndex].classList.add('opacity-100');
+    document.getElementById('currentImageCounter').textContent = `${currentImgIndex + 1}/${images.length}`;
+}
 
 async function loadProperty() {
     try {
         const res = await fetch(`http://localhost:3000/api/properties/${propertyId}`);
         const p = await res.json();
 
+        // Pre-fill all fields
         document.getElementById('title').value = p.title || '';
         document.getElementById('description').value = p.description || '';
         document.getElementById('price').value = p.price || '';
@@ -214,7 +277,26 @@ async function loadProperty() {
         document.getElementById('availability_date').value = p.availability_date ? p.availability_date.split('T')[0] : '';
         document.getElementById('nearby_landmarks').value = p.nearby_landmarks || '';
         document.getElementById('latitude').value = p.latitude || '';
-        document.getElementById('longitude').value = p.longitude || ''; 
+        document.getElementById('longitude').value = p.longitude || '';
+
+        // Show existing images
+        if (p.images && p.images.length > 0) {
+            const section = document.getElementById('currentImagesSection');
+            const container = document.getElementById('currentImages');
+            section.classList.remove('hidden');
+            container.innerHTML = p.images.map((img, index) => `
+                <img src="http://localhost:3000/${img.replace(/\\/g,'/')}"
+                    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0'}"
+                    data-current-index="${index}">
+            `).join('');
+            document.getElementById('currentImageCounter').textContent = `1/${p.images.length}`;
+
+            // Hide arrows if only one image
+            if (p.images.length === 1) {
+                document.querySelectorAll('#currentImagesSection button[type="button"]').forEach(btn => btn.classList.add('hidden'));
+            }
+        }
+
     } catch (error) {
         document.getElementById('message').textContent = 'Error loading property details.';
     }
@@ -227,32 +309,32 @@ document.getElementById('editPropertyForm').addEventListener('submit', async (e)
     const messageEl = document.getElementById('message');
 
     const updatedData = {
-    title: document.getElementById('title').value,
-    description: document.getElementById('description').value,
-    price: document.getElementById('price').value,
-    purpose: document.getElementById('purpose').value,
-    negotiable_price: document.getElementById('negotiable_price').checked,
-    location: document.getElementById('location').value,
-    address: document.getElementById('address').value || null,
-    property_type: document.getElementById('property_type').value || null,
-    plot_size: document.getElementById('plot_size').value || null,
-    built_up_area: document.getElementById('built_up_area').value || null,
-    carpet_area: document.getElementById('carpet_area').value || null,
-    floor_number: document.getElementById('floor_number').value || null,
-    total_floors: document.getElementById('total_floors').value || null,
-    bedrooms: document.getElementById('bedrooms').value,
-    bathrooms: document.getElementById('bathrooms').value,
-    balconies: document.getElementById('balconies').value || null,
-    furnished_status: document.getElementById('furnished_status').value,
-    property_age: document.getElementById('property_age').value,
-    facing: document.getElementById('facing').value || null,
-    ownership_type: document.getElementById('ownership_type').value || null,
-    parking: document.getElementById('parking').checked,
-    availability_date: document.getElementById('availability_date').value || null,
-    nearby_landmarks: document.getElementById('nearby_landmarks').value || null
-    latitude: document.getElementById('latitude').value || null,
-    longitude: document.getElementById('longitude').value || null
-};
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        price: document.getElementById('price').value,
+        purpose: document.getElementById('purpose').value,
+        negotiable_price: document.getElementById('negotiable_price').checked,
+        location: document.getElementById('location').value,
+        address: document.getElementById('address').value || null,
+        property_type: document.getElementById('property_type').value || null,
+        plot_size: document.getElementById('plot_size').value || null,
+        built_up_area: document.getElementById('built_up_area').value || null,
+        carpet_area: document.getElementById('carpet_area').value || null,
+        floor_number: document.getElementById('floor_number').value || null,
+        total_floors: document.getElementById('total_floors').value || null,
+        bedrooms: document.getElementById('bedrooms').value || null,
+        bathrooms: document.getElementById('bathrooms').value || null,
+        balconies: document.getElementById('balconies').value || null,
+        furnished_status: document.getElementById('furnished_status').value,
+        property_age: document.getElementById('property_age').value,
+        facing: document.getElementById('facing').value || null,
+        ownership_type: document.getElementById('ownership_type').value || null,
+        parking: document.getElementById('parking').checked,
+        availability_date: document.getElementById('availability_date').value || null,
+        nearby_landmarks: document.getElementById('nearby_landmarks').value || null,
+        latitude: document.getElementById('latitude').value || null,
+        longitude: document.getElementById('longitude').value || null
+    };
 
     try {
         const res = await fetch(`http://localhost:3000/api/properties/${propertyId}`, {
@@ -279,23 +361,24 @@ document.getElementById('editPropertyForm').addEventListener('submit', async (e)
         messageEl.className = 'text-center mt-4 text-sm text-red-600';
     }
 });
-        // Auto-detect location
-        document.getElementById('detectLocation').addEventListener('click', () => {
-            if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser');
-                return;
-            }
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
-                    document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
-                    alert('✅ Location detected successfully!');
-                },
-                () => {
-                    alert('Unable to detect location. Please enter coordinates manually.');
-                }
-            );
-        });
+
+// Auto-detect location
+document.getElementById('detectLocation').addEventListener('click', () => {
+    if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser');
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+            document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+            alert('✅ Location detected successfully!');
+        },
+        () => {
+            alert('Unable to detect location. Please enter coordinates manually.');
+        }
+    );
+});
 </script>
 
 </body>

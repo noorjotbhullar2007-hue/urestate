@@ -123,9 +123,11 @@ if (!token || !user) {
 document.getElementById('logoutBtn').addEventListener('click', logout);
 document.getElementById('logoutBtnMobile').addEventListener('click', logout);
 function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/public/index.html';
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/public/index.html';
+    }
 }
 
 // Hamburger menu

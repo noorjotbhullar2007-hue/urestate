@@ -70,10 +70,13 @@ router.get('/', (req, res) => {
     `;
     const params = [];
 
-    if (location) {
-        sql += ' AND location LIKE ?';
-        params.push(`%${location}%`);
-    }
+   if (location) {
+    const words = location.trim().split(/\s+/);
+    words.forEach(word => {
+        sql += ' AND (p.location LIKE ? OR p.address LIKE ? OR p.nearby_landmarks LIKE ? OR p.title LIKE ?)';
+        params.push(`%${word}%`, `%${word}%`, `%${word}%`, `%${word}%`);
+    });
+}
     if (purpose) {
         sql += ' AND purpose = ?';
         params.push(purpose);
