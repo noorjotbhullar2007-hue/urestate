@@ -26,7 +26,15 @@
 
     <input type="text" id="city" placeholder="City"
         class="w-full p-2 mb-4 border rounded">
-
+        <div class="flex items-start gap-2 mb-4">
+            <input type="checkbox" id="terms" required class="mt-1">
+            <label for="terms" class="text-sm text-gray-600">
+                I agree to the 
+                <a href="/public/terms.html" target="_blank" class="text-blue-600 hover:underline">
+                    Terms & Conditions
+                </a>
+            </label>
+        </div>
         <button type="submit"
             class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
             Register
@@ -62,9 +70,9 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         const data = await res.json();
 
         if (res.ok) {
-    messageEl.textContent = data.message + ' Redirecting to login...';
+    messageEl.textContent = data.message;
     messageEl.className = 'text-center mt-4 text-sm text-green-600';
-    setTimeout(() => window.location.href = '/public/login.html', 1500);
+    setTimeout(() => window.location.href = `/public/verify-otp.html?email=${encodeURIComponent(data.email)}`, 1500);
 } else {
     // Show friendly error messages
     let errorMsg = data.message;
