@@ -285,7 +285,7 @@ async function loadProperty() {
             const container = document.getElementById('currentImages');
             section.classList.remove('hidden');
             container.innerHTML = p.images.map((img, index) => `
-                <img src="http://localhost:3000/${img.replace(/\\/g,'/')}"
+                <img src="${img.startsWith('http') ? img : 'http://localhost:3000/' + img.replace(/\\/g,'/')}"
                     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0'}"
                     data-current-index="${index}">
             `).join('');

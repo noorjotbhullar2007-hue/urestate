@@ -97,7 +97,7 @@ async function loadPropertyDetails() {
     <div class="relative w-full h-72 bg-gray-200 rounded overflow-hidden mb-2">
         <!-- Images -->
         ${p.images.map((img, index) => `
-            <img src="http://localhost:3000/${img.replace(/\\/g,'/')}" 
+            <img src="${img.startsWith('http') ? img : 'http://localhost:3000/' + img.replace(/\\/g,'/')}" 
                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0'}"
                 data-index="${index}">
         `).join('')}

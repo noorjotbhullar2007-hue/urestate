@@ -354,7 +354,7 @@ async function loadMyProperties() {
         container.innerHTML = myProperties.map(p => `
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 ${p.thumbnail
-                    ? `<img src="http://localhost:3000/${p.thumbnail.replace(/\\/g,'/')}" class="h-48 w-full object-cover">`
+                    ? `<img src="${p.thumbnail.startsWith('http') ? p.thumbnail : 'http://localhost:3000/' + p.thumbnail.replace(/\\/g,'/')}" class="h-48 w-full object-cover">`
                     : `<div class="h-48 bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>`
                 }
                 <div class="p-4">

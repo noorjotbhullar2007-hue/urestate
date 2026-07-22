@@ -5,7 +5,17 @@ const upload = require('../config/multerConfig');
 const protect = require('../middleware/authMiddleware');
 
 // ADD PROPERTY (protected, with image upload)
-router.post('/add', protect, upload.array('images', 5), (req, res) => {
+router.post('/add', protect, (req, res, next) => {
+    upload.array('images', 5)(req, res, (err) => {
+        if (err) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ message: 'Each image must be under 5MB' });
+            }
+            return res.status(400).json({ message: 'Error uploading images', error: err.message });
+        }
+        next();
+    });
+}, (req, res) => {
     const {
         title, description, price, location, property_type, purpose,
         negotiable_price, address, plot_size, built_up_area, carpet_area,
