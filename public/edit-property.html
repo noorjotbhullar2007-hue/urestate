@@ -249,7 +249,7 @@ function currentChangeImage(direction) {
 
 async function loadProperty() {
     try {
-        const res = await fetch(`http://localhost:3000/api/properties/${propertyId}`);
+        const res = await fetch(`https://urestate.onrender.com/api/properties/${propertyId}`);
         const p = await res.json();
 
         // Pre-fill all fields
@@ -285,7 +285,7 @@ async function loadProperty() {
             const container = document.getElementById('currentImages');
             section.classList.remove('hidden');
             container.innerHTML = p.images.map((img, index) => `
-                <img src="${img.startsWith('http') ? img : 'http://localhost:3000/' + img.replace(/\\/g,'/')}"
+                <img src="${img.startsWith('http') ? img : 'https://urestate.onrender.com/' + img.replace(/\\/g,'/')}"
                     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0'}"
                     data-current-index="${index}">
             `).join('');
@@ -337,7 +337,7 @@ document.getElementById('editPropertyForm').addEventListener('submit', async (e)
     };
 
     try {
-        const res = await fetch(`http://localhost:3000/api/properties/${propertyId}`, {
+        const res = await fetch(`https://urestate.onrender.com/api/properties/${propertyId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

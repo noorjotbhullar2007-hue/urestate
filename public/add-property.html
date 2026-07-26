@@ -295,7 +295,7 @@ document.getElementById('addPropertyForm').addEventListener('submit', async (e) 
     }
 
     try {
-        const res = await fetch('http://localhost:3000/api/properties/add', {
+        const res = await fetch('https://urestate.onrender.com/api/properties/add', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token },
             body: formData

@@ -166,7 +166,7 @@ function switchTab(tab) {
 // Load unread count for badge
 async function loadUnreadCount() {
     try {
-        const res = await fetch('http://localhost:3000/api/messages/unread', {
+        const res = await fetch('https://urestate.onrender.com/api/messages/unread', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         const data = await res.json();
@@ -184,7 +184,7 @@ async function loadUnreadCount() {
 
 async function loadTopProfile() {
     try {
-        const res = await fetch('http://localhost:3000/api/auth/profile', {
+        const res = await fetch('https://urestate.onrender.com/api/auth/profile', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         const profile = await res.json();
@@ -207,7 +207,7 @@ async function loadMessages() {
     container.innerHTML = '<p class="text-gray-500">Loading messages...</p>';
 
     try {
-        const res = await fetch('http://localhost:3000/api/messages/conversations', {
+        const res = await fetch('https://urestate.onrender.com/api/messages/conversations', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         const messages = await res.json();
@@ -246,7 +246,7 @@ async function loadMessages() {
         `).join('');
 
         // Mark all as read (4.3)
-        await fetch('http://localhost:3000/api/messages/conversations/read', {
+        await fetch('https://urestate.onrender.com/api/messages/conversations/read', {
             method: 'PUT',
             headers: { 'Authorization': 'Bearer ' + token }
         });
@@ -263,7 +263,7 @@ async function loadSentMessages() {
     container.innerHTML = '<p class="text-gray-500">Loading sent messages...</p>';
 
     try {
-        const res = await fetch('http://localhost:3000/api/messages/sent', {
+        const res = await fetch('https://urestate.onrender.com/api/messages/sent', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         const messages = await res.json();
@@ -308,7 +308,7 @@ async function sendReply(propertyId, receiverId, messageId) {
     }
 
     try {
-        const res = await fetch('http://localhost:3000/api/messages/reply', {
+        const res = await fetch('https://urestate.onrender.com/api/messages/reply', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -342,7 +342,7 @@ async function loadMyProperties() {
     const container = document.getElementById('myProperties');
 
     try {
-        const res = await fetch('http://localhost:3000/api/properties');
+        const res = await fetch('https://urestate.onrender.com/api/properties');
         const allProperties = await res.json();
         const myProperties = allProperties.filter(p => p.user_id === user.id);
 
@@ -354,7 +354,7 @@ async function loadMyProperties() {
         container.innerHTML = myProperties.map(p => `
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 ${p.thumbnail
-                    ? `<img src="${p.thumbnail.startsWith('http') ? p.thumbnail : 'http://localhost:3000/' + p.thumbnail.replace(/\\/g,'/')}" class="h-48 w-full object-cover">`
+                    ? `<img src="${p.thumbnail.startsWith('http') ? p.thumbnail : 'https://urestate.onrender.com/' + p.thumbnail.replace(/\\/g,'/')}" class="h-48 w-full object-cover">`
                     : `<div class="h-48 bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>`
                 }
                 <div class="p-4">
@@ -378,7 +378,7 @@ async function deleteProperty(id) {
     if (!confirm('Are you sure you want to delete this property?')) return;
 
     try {
-        const res = await fetch(`http://localhost:3000/api/properties/${id}`, {
+        const res = await fetch(`https://urestate.onrender.com/api/properties/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + token }
         });

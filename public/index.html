@@ -182,7 +182,7 @@ async function loadProperties(filters = '') {
     propertyList.innerHTML = '<p class="text-gray-500">Loading properties...</p>';
 
     try {
-    const res = await fetch(`http://localhost:3000/api/properties${filters}`);
+    const res = await fetch(`https://urestate.onrender.com/api/properties${filters}`);
     const properties = await res.json();
     allPropertiesData = properties;
 
@@ -195,7 +195,7 @@ async function loadProperties(filters = '') {
     propertyList.innerHTML = properties.map(p => `
             <a href="/public/property.html?id=${p.id}" class="block bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden">
                 ${p.thumbnail
-                    ? `<img src="${p.thumbnail.startsWith('http') ? p.thumbnail : 'http://localhost:3000/' + p.thumbnail.replace(/\\/g,'/')}" class="h-48 w-full object-cover">`
+                    ? `<img src="${p.thumbnail.startsWith('http') ? p.thumbnail : 'https://urestate.onrender.com/' + p.thumbnail.replace(/\\/g,'/')}" class="h-48 w-full object-cover">`
                     : `<div class="h-48 bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>`
                 }
                 <div class="p-4">
