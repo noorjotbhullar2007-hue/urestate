@@ -31,12 +31,12 @@ router.post('/register', async (req, res) => {
             }
 
             // Send OTP email
-            await sendOTPEmail(email, name, otp);
+//            await sendOTPEmail(email, name, otp);
 
-            res.status(201).json({ 
-                message: 'Registration successful! Please check your email for the OTP verification code.',
-                email: email
-            });
+                res.status(201).json({ 
+                    message: 'Registration successful!',
+                    email: email
+                });
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
@@ -59,9 +59,9 @@ router.post('/login', (req, res) => {
         }
 
         const user = results[0];
-                if (!user.is_verified) {
-            return res.status(401).json({ message: 'Please verify your email first. Check your inbox for the OTP code.' });
-        }
+//              if (!user.is_verified) {
+//          return res.status(401).json({ message: 'Please verify your email first. Check your inbox for the OTP code.' });
+//    }
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
