@@ -121,7 +121,15 @@ router.get('/', (req, res) => {
         res.json(results);
     });
 });
-
+// GET PROPERTY IMAGES WITH IDs
+router.get('/images/:propertyId', (req, res) => {
+    const propertyId = req.params.propertyId;
+    const sql = 'SELECT id, image_path FROM property_images WHERE property_id = ?';
+    db.query(sql, [propertyId], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Error fetching images', error: err });
+        res.json(results);
+    });
+});
 // GET SINGLE PROPERTY (with its images)
 router.get('/:id', (req, res) => {
     const propertyId = req.params.id;
@@ -259,4 +267,5 @@ router.post('/image/:propertyId', protect, upload.array('images', 5), (req, res)
         });
     });
 });
+
 module.exports = router;
