@@ -39,23 +39,22 @@
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Edit Property</h1>
 
     <!-- Current Images -->
-    <div id="currentImagesSection" class="hidden mb-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-3">Current Images</h2>
-        <div class="relative w-full h-48 bg-gray-100 rounded overflow-hidden">
-            <div id="currentImages"></div>
-            <button type="button" onclick="currentChangeImage(-1)"
-                class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-opacity-75 text-lg">
-                &#8249;
-            </button>
-            <button type="button" onclick="currentChangeImage(1)"
-                class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-opacity-75 text-lg">
-                &#8250;
-            </button>
-            <div id="currentImageCounter" class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                1/1
-            </div>
-        </div>
-    </div>
+<div id="currentImagesSection" class="hidden mb-6">
+    <h2 class="text-lg font-semibold text-gray-700 mb-3">Current Images</h2>
+    <div id="currentImageGrid" class="grid grid-cols-3 gap-2 mb-3"></div>
+
+    <!-- Add New Images -->
+    <h2 class="text-lg font-semibold text-gray-700 mb-2 mt-4">Add More Images</h2>
+    <p class="text-xs text-gray-400 mb-2">Maximum 5MB per image. Supported: JPG, PNG, WEBP</p>
+    <input type="file" id="newImages" multiple accept="image/*"
+        class="w-full mb-2" onchange="previewNewImages(event)">
+    <div id="newImagePreview" class="flex flex-wrap gap-2 mb-3"></div>
+    <button type="button" onclick="uploadNewImages()"
+        class="w-full border border-blue-600 text-blue-600 p-2 rounded hover:bg-blue-50 mb-3">
+        📤 Upload New Images
+    </button>
+    <p id="uploadStatus" class="text-sm text-center"></p>
+</div>
 
     <form id="editPropertyForm">
 
@@ -235,17 +234,17 @@ const params = new URLSearchParams(window.location.search);
 const propertyId = params.get('id');
 
 // Current images carousel
-let currentImgIndex = 0;
-function currentChangeImage(direction) {
-    const images = document.querySelectorAll('[data-current-index]');
-    if (images.length === 0) return;
-    images[currentImgIndex].classList.remove('opacity-100');
-    images[currentImgIndex].classList.add('opacity-0');
-    currentImgIndex = (currentImgIndex + direction + images.length) % images.length;
-    images[currentImgIndex].classList.remove('opacity-0');
-    images[currentImgIndex].classList.add('opacity-100');
-    document.getElementById('currentImageCounter').textContent = `${currentImgIndex + 1}/${images.length}`;
-}
+//let currentImgIndex = 0;
+//function currentChangeImage(direction) {
+    //const images = document.querySelectorAll('[data-current-index]');
+    //if (images.length === 0) return;
+    //images[currentImgIndex].classList.remove('opacity-100');
+    //images[currentImgIndex].classList.add('opacity-0');
+    //currentImgIndex = (currentImgIndex + direction + images.length) % images.length;
+    //images[currentImgIndex].classList.remove('opacity-0');
+    //images[currentImgIndex].classList.add('opacity-100');
+  //  document.getElementById('currentImageCounter').textContent = `${currentImgIndex + 1}/${images.length}`;
+//}
 
 async function loadProperty() {
     try {
@@ -280,22 +279,11 @@ async function loadProperty() {
         document.getElementById('longitude').value = p.longitude || '';
 
         // Show existing images
-        if (p.images && p.images.length > 0) {
-            const section = document.getElementById('currentImagesSection');
-            const container = document.getElementById('currentImages');
-            section.classList.remove('hidden');
-            container.innerHTML = p.images.map((img, index) => `
-                <img src="${img.startsWith('http') ? img : 'https://urestate.onrender.com/' + img.replace(/\\/g,'/')}"
-                    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0'}"
-                    data-current-index="${index}">
-            `).join('');
-            document.getElementById('currentImageCounter').textContent = `1/${p.images.length}`;
-
-            // Hide arrows if only one image
-            if (p.images.length === 1) {
-                document.querySelectorAll('#currentImagesSection button[type="button"]').forEach(btn => btn.classList.add('hidden'));
-            }
-        }
+if (p.images && p.images.length > 0) {
+    const section = document.getElementById('currentImagesSection');
+    section.classList.remove('hidden');
+    displayCurrentImages(p.images);
+}
 
     } catch (error) {
         document.getElementById('message').textContent = 'Error loading property details.';
@@ -379,6 +367,123 @@ document.getElementById('detectLocation').addEventListener('click', () => {
         }
     );
 });
+// Store images data globally
+let currentPropertyImages = [];
+
+function displayCurrentImages(images) {
+    currentPropertyImages = images;
+    const grid = document.getElementById('currentImageGrid');
+    
+    if (images.length === 0) {
+        grid.innerHTML = '<p class="text-gray-400 text-sm col-span-3">No images — add some below!</p>';
+        return;
+    }
+
+    grid.innerHTML = images.map((img, index) => `
+        <div class="relative" id="imgContainer-${index}">
+            <img src="${img.startsWith('http') ? img : 'https://urestate.onrender.com/' + img.replace(/\\/g,'/')}"
+                class="w-full h-24 object-cover rounded border">
+            <button type="button" onclick="deleteImage(${index})"
+                class="absolute top-1 right-1 bg-red-500 text-white text-xs px-1 rounded hover:bg-red-600">
+                ✕
+            </button>
+        </div>
+    `).join('');
+}
+
+async function deleteImage(index) {
+    if (!confirm('Delete this image?')) return;
+
+    // Get image ID from database
+    try {
+        const res = await fetch(`https://urestate.onrender.com/api/properties/${propertyId}`);
+        const p = await res.json();
+
+        // We need image IDs — let's fetch them separately
+        const imgRes = await fetch(`https://urestate.onrender.com/api/properties/images/${propertyId}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!imgRes.ok) {
+            alert('Could not fetch image details.');
+            return;
+        }
+
+        const imgData = await imgRes.json();
+        const imageId = imgData[index].id;
+
+        const deleteRes = await fetch(`https://urestate.onrender.com/api/properties/image/${imageId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        const data = await deleteRes.json();
+        if (deleteRes.ok) {
+            // Remove from display
+            document.getElementById(`imgContainer-${index}`).remove();
+            alert('✅ Image deleted!');
+        } else {
+            alert('❌ ' + data.message);
+        }
+    } catch (error) {
+        alert('Something went wrong.');
+    }
+}
+
+// Preview new images before upload
+function previewNewImages(event) {
+    const preview = document.getElementById('newImagePreview');
+    preview.innerHTML = '';
+    Array.from(event.target.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            preview.innerHTML += `
+                <img src="${e.target.result}" class="w-20 h-20 object-cover rounded border">
+            `;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Upload new images
+async function uploadNewImages() {
+    const files = document.getElementById('newImages').files;
+    const statusEl = document.getElementById('uploadStatus');
+
+    if (files.length === 0) {
+        statusEl.textContent = 'Please select images first.';
+        statusEl.className = 'text-sm text-center text-red-600';
+        return;
+    }
+
+    const formData = new FormData();
+    Array.from(files).forEach(file => formData.append('images', file));
+
+    try {
+        const res = await fetch(`https://urestate.onrender.com/api/properties/image/${propertyId}`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            statusEl.textContent = '✅ Images uploaded successfully!';
+            statusEl.className = 'text-sm text-center text-green-600';
+            document.getElementById('newImages').value = '';
+            document.getElementById('newImagePreview').innerHTML = '';
+            // Reload property to show new images
+            loadProperty();
+        } else {
+            statusEl.textContent = '❌ ' + data.message;
+            statusEl.className = 'text-sm text-center text-red-600';
+        }
+    } catch (error) {
+        statusEl.textContent = 'Something went wrong.';
+        statusEl.className = 'text-sm text-center text-red-600';
+    }
+}
 </script>
 
 </body>

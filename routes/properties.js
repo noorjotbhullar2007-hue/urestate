@@ -211,5 +211,52 @@ router.delete('/:id', protect, (req, res) => {
         });
     });
 });
+// DELETE SINGLE IMAGE
+router.delete('/image/:imageId', protect, (req, res) => {
+    const imageId = req.params.imageId;
+    const userId = req.userId;
 
+    // Check image belongs to user's property
+    const checkSql = `
+        SELECT pi.id, p.user_id 
+        FROM property_images pi 
+        JOIN properties p ON pi.property_id = p.id 
+        WHERE pi.id = ?
+    `;
+    db.query(checkSql, [imageId], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Server error', error: err });
+        if (results.length === 0) return res.status(404).json({ message: 'Image not found' });
+        if (results[0].user_id !== userId) return res.status(403).json({ message: 'Not authorized' });
+
+        const deleteSql = 'DELETE FROM property_images WHERE id = ?';
+        db.query(deleteSql, [imageId], (deleteErr) => {
+            if (deleteErr) return res.status(500).json({ message: 'Error deleting image', error: deleteErr });
+            res.json({ message: 'Image deleted successfully!' });
+        });
+    });
+});
+
+// ADD IMAGES TO EXISTING PROPERTY
+router.post('/image/:propertyId', protect, upload.array('images', 5), (req, res) => {
+    const propertyId = req.params.propertyId;
+    const userId = req.userId;
+
+    const checkSql = 'SELECT * FROM properties WHERE id = ?';
+    db.query(checkSql, [propertyId], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Server error', error: err });
+        if (results.length === 0) return res.status(404).json({ message: 'Property not found' });
+        if (results[0].user_id !== userId) return res.status(403).json({ message: 'Not authorized' });
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: 'No images provided' });
+        }
+
+        const imageValues = req.files.map(file => [propertyId, file.path]);
+        const imgSql = 'INSERT INTO property_images (property_id, image_path) VALUES ?';
+        db.query(imgSql, [imageValues], (imgErr) => {
+            if (imgErr) return res.status(500).json({ message: 'Error adding images', error: imgErr });
+            res.status(201).json({ message: 'Images added successfully!' });
+        });
+    });
+});
 module.exports = router;
