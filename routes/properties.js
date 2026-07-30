@@ -49,7 +49,7 @@ router.post('/add', protect, (req, res, next) => {
         negotiable_price === 'true' ? 1 : 0, address || null, plot_size || null, built_up_area || null, carpet_area || null,
         floor_number || null, total_floors || null, bedrooms || null, bathrooms || null, balconies || null,
         parking === 'true' ? 1 : 0, furnished_status, property_age, facing || null, ownership_type || null,
-        availability_date, nearby_landmarks, latitude || null, longitude || null, is_official === 'true' ? 1 : 0
+        availability_date || null, nearby_landmarks || null, latitude || null, longitude || null, is_official === 'true' ? 1 : 0
     ],
      (err, result) => {
         if (err) return res.status(500).json({ message: 'Error adding property', error: err });
