@@ -72,7 +72,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         if (res.ok) {
     messageEl.textContent = data.message;
     messageEl.className = 'text-center mt-4 text-sm text-green-600';
-    setTimeout(() => window.location.href = `/public/login.html`, 1500);
+setTimeout(() => window.location.href = `/public/verify-otp.html?email=${encodeURIComponent(data.email)}`, 1500);
 } else {
     // Show friendly error messages
     let errorMsg = data.message;
