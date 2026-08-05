@@ -228,6 +228,31 @@ ${p.is_official ? '<span class="inline-block bg-yellow-400 text-yellow-900 text-
                 <p class="text-gray-500">Please <a href="/public/login.html" class="text-blue-600">login</a> to contact the owner.</p>
             </div>
             ` : ''}
+            <!-- Report Button -->
+${token && currentUser.id !== p.user_id ? `
+<div class="mt-4 text-right">
+    <button onclick="toggleReport()" class="text-gray-400 hover:text-red-500 text-sm">
+        🚩 Report this listing
+    </button>
+    <div id="reportForm" class="hidden mt-3 bg-red-50 border border-red-200 rounded p-4">
+        <p class="text-sm font-semibold text-red-700 mb-2">Report this listing</p>
+        <select id="reportReason" class="w-full p-2 border rounded text-sm mb-2">
+            <option value="">Select a reason</option>
+            <option value="Fake listing">Fake listing</option>
+            <option value="Wrong information">Wrong information</option>
+            <option value="Already sold/rented">Already sold/rented</option>
+            <option value="Spam">Spam</option>
+            <option value="Inappropriate content">Inappropriate content</option>
+            <option value="Other">Other</option>
+        </select>
+        <button onclick="submitReport(${p.id})"
+            class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 text-sm">
+            Submit Report
+        </button>
+        <p id="reportStatus" class="text-sm mt-2 text-center"></p>
+    </div>
+</div>
+` : ''}
         `;
 
         resolve();
@@ -312,6 +337,49 @@ loadPropertyDetails().then(() => {
             .openPopup();
     }
 });
+function toggleReport() {
+    const form = document.getElementById('reportForm');
+    form.classList.toggle('hidden');
+}
+
+async function submitReport(propertyId) {
+    const reason = document.getElementById('reportReason').value;
+    const statusEl = document.getElementById('reportStatus');
+
+    if (!reason) {
+        statusEl.textContent = '❌ Please select a reason.';
+        statusEl.className = 'text-sm mt-2 text-center text-red-600';
+        return;
+    }
+
+    try {
+        const res = await fetch(`https://urestate.onrender.com/api/properties/report/${propertyId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ reason })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            statusEl.textContent = '✅ ' + data.message;
+            statusEl.className = 'text-sm mt-2 text-center text-green-600';
+            document.getElementById('reportReason').value = '';
+            setTimeout(() => {
+                document.getElementById('reportForm').classList.add('hidden');
+            }, 2000);
+        } else {
+            statusEl.textContent = '❌ ' + data.message;
+            statusEl.className = 'text-sm mt-2 text-center text-red-600';
+        }
+    } catch (error) {
+        statusEl.textContent = 'Something went wrong. Try again.';
+        statusEl.className = 'text-sm mt-2 text-center text-red-600';
+    }
+}
 </script>
 
 </body>

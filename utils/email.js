@@ -135,5 +135,50 @@ const sendPasswordResetEmail = async (email, name, resetLink) => {
         return false;
     }
 };
+// Send report notification to admin
+const sendReportEmail = async (propertyTitle, propertyId, reason, reporterId) => {
+    try {
+        const msg = {
+            to: process.env.EMAIL_USER,
+            from: {
+                email: process.env.EMAIL_USER,
+                name: 'Urestate'
+            },
+            subject: `⚠️ Property Reported - ${propertyTitle}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 100%; margin: 0 auto; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    <div style="background-color: #dc2626; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 24px;">⚠️ Property Reported</h1>
+                    </div>
+                    <div style="padding: 20px;">
+                        <p style="color: #4b5563; font-size: 14px;">A property has been reported on Urestate.</p>
+                        <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="margin: 0 0 10px 0;"><strong>Property:</strong> ${propertyTitle}</p>
+                            <p style="margin: 0 0 10px 0;"><strong>Property ID:</strong> ${propertyId}</p>
+                            <p style="margin: 0 0 10px 0;"><strong>Reported by User ID:</strong> ${reporterId}</p>
+                            <p style="margin: 0;"><strong>Reason:</strong> ${reason}</p>
+                        </div>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <a href="${process.env.APP_URL}/public/property.html?id=${propertyId}" 
+                               style="background-color: #dc2626; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">
+                                View Property
+                            </a>
+                        </div>
+                    </div>
+                    <div style="background-color: #f9fafb; padding: 15px; border-radius: 0 0 8px 8px; text-align: center;">
+                        <p style="color: #9ca3af; font-size: 12px; margin: 0;">© 2026 Urestate. All rights reserved.</p>
+                    </div>
+                </div>
+            `
+        };
 
-module.exports = { sendMessageNotification, sendOTPEmail, sendPasswordResetEmail };
+        await sgMail.send(msg);
+        console.log(`Report email sent to admin`);
+        return true;
+    } catch (error) {
+        console.error('Error sending report email:', error);
+        return false;
+    }
+};
+
+module.exports = { sendMessageNotification, sendOTPEmail, sendPasswordResetEmail, sendReportEmail };

@@ -267,4 +267,48 @@ router.post('/image/:propertyId', protect, upload.array('images', 5), (req, res)
     });
 });
 
+// REPORT PROPERTY
+router.post('/report/:propertyId', protect, (req, res) => {
+    const propertyId = req.params.propertyId;
+    const reporter_id = req.userId;
+    const { reason } = req.body;
+
+    if (!reason) {
+        return res.status(400).json({ message: 'Please provide a reason for reporting' });
+    }
+
+    // Check property exists
+    const checkSql = 'SELECT * FROM properties WHERE id = ?';
+    db.query(checkSql, [propertyId], (err, results) => {
+        if (err) return res.status(500).json({ message: 'Server error', error: err });
+        if (results.length === 0) return res.status(404).json({ message: 'Property not found' });
+
+        // Check if user already reported this property
+        const dupSql = 'SELECT * FROM reports WHERE property_id = ? AND reporter_id = ?';
+        db.query(dupSql, [propertyId, reporter_id], (dupErr, dupResults) => {
+            if (dupErr) return res.status(500).json({ message: 'Server error', error: dupErr });
+            if (dupResults.length > 0) {
+                return res.status(400).json({ message: 'You have already reported this property' });
+            }
+
+            // Save report
+            const sql = 'INSERT INTO reports (property_id, reporter_id, reason) VALUES (?, ?, ?)';
+            db.query(sql, [propertyId, reporter_id, reason], async (insertErr) => {
+                if (insertErr) return res.status(500).json({ message: 'Error saving report', error: insertErr });
+
+                // Send email to admin
+                const { sendReportEmail } = require('../utils/email');
+                await sendReportEmail(
+                    results[0].title,
+                    propertyId,
+                    reason,
+                    reporter_id
+                );
+
+                res.status(201).json({ message: 'Report submitted successfully. Thank you!' });
+            });
+        });
+    });
+});
+
 module.exports = router;
