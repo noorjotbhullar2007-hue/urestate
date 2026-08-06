@@ -7,6 +7,7 @@ const db = require('./config/db');
 const authRoutes = require('./routes/auth');
 const propertyRoutes = require('./routes/properties');
 const messageRoutes = require('./routes/messages');
+const adminRoutes = require('./routes/admin');
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Test route
 app.get('/', (req, res) => {

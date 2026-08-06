@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Urestate</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Navbar -->
+<nav class="bg-white shadow p-4 flex justify-between items-center">
+    <a href="/public/index.html" class="text-xl font-bold text-blue-600">Urestate</a>
+    <div class="space-x-4">
+        <span id="adminName" class="text-gray-600 text-sm"></span>
+        <button onclick="logoutConfirm()" class="text-red-600 hover:underline text-sm">Logout</button>
+    </div>
+</nav>
+
+<div class="max-w-6xl mx-auto p-4 mt-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">⚙️ Admin Dashboard</h1>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-3xl font-bold text-blue-600" id="totalUsers">-</p>
+            <p class="text-gray-500 text-sm mt-1">Total Users</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-3xl font-bold text-green-600" id="totalProperties">-</p>
+            <p class="text-gray-500 text-sm mt-1">Total Listings</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-3xl font-bold text-purple-600" id="totalMessages">-</p>
+            <p class="text-gray-500 text-sm mt-1">Total Messages</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-3xl font-bold text-red-600" id="totalReports">-</p>
+            <p class="text-gray-500 text-sm mt-1">Total Reports</p>
+        </div>
+    </div>
+
+    <!-- Second Row Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-3xl font-bold text-blue-400" id="newUsersWeek">-</p>
+            <p class="text-gray-500 text-sm mt-1">New Users (7 days)</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-3xl font-bold text-green-400" id="newPropertiesWeek">-</p>
+            <p class="text-gray-500 text-sm mt-1">New Listings (7 days)</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-3xl font-bold text-yellow-500" id="officialListings">-</p>
+            <p class="text-gray-500 text-sm mt-1">Official Listings</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-3xl font-bold text-gray-600" id="totalImages">-</p>
+            <p class="text-gray-500 text-sm mt-1">Total Images</p>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Properties by Type -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4">Listings by Type</h2>
+            <canvas id="typeChart" height="200"></canvas>
+        </div>
+        <!-- Properties by Purpose -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4">Listings by Purpose</h2>
+            <canvas id="purposeChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Recent Registrations</h2>
+        <div id="recentUsers" class="overflow-x-auto">
+            <p class="text-gray-400">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Recent Reports -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Recent Reports</h2>
+        <div id="recentReports">
+            <p class="text-gray-400">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Recent Properties -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Recent Listings</h2>
+        <div id="recentProperties" class="overflow-x-auto">
+            <p class="text-gray-400">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function logoutConfirm() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/public/index.html';
+    }
+}
+
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+// Redirect if not logged in or not admin
+if (!token || !user || user.email !== 'urestateofficial@gmail.com') {
+    alert('Access denied. Admin only.');
+    window.location.href = '/public/index.html';
+}
+
+document.getElementById('adminName').textContent = 'Welcome, ' + user.name;
+
+async function loadStats() {
+    try {
+        const res = await fetch('https://urestate.onrender.com/api/admin/stats', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+
+        // Stats cards
+        document.getElementById('totalUsers').textContent = data.totalUsers;
+        document.getElementById('totalProperties').textContent = data.totalProperties;
+        document.getElementById('totalMessages').textContent = data.totalMessages;
+        document.getElementById('totalReports').textContent = data.totalReports;
+        document.getElementById('newUsersWeek').textContent = data.newUsersWeek;
+        document.getElementById('newPropertiesWeek').textContent = data.newPropertiesWeek;
+        document.getElementById('officialListings').textContent = data.officialListings;
+        document.getElementById('totalImages').textContent = data.totalImages;
+
+        // Properties by type chart
+        new Chart(document.getElementById('typeChart'), {
+            type: 'doughnut',
+            data: {
+                labels: data.byType.map(t => t.property_type || 'Unknown'),
+                datasets: [{
+                    data: data.byType.map(t => t.count),
+                    backgroundColor: ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444']
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Properties by purpose chart
+        new Chart(document.getElementById('purposeChart'), {
+            type: 'doughnut',
+            data: {
+                labels: data.byPurpose.map(p => p.purpose === 'rent' ? 'For Rent' : 'For Sale'),
+                datasets: [{
+                    data: data.byPurpose.map(p => p.count),
+                    backgroundColor: ['#3b82f6', '#22c55e']
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Recent users table
+        if (data.recentUsers.length > 0) {
+            document.getElementById('recentUsers').innerHTML = `
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left py-2 text-gray-500">Name</th>
+                            <th class="text-left py-2 text-gray-500">Email</th>
+                            <th class="text-left py-2 text-gray-500">City</th>
+                            <th class="text-left py-2 text-gray-500">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.recentUsers.map(u => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="py-2">${u.name}</td>
+                                <td class="py-2 text-gray-500">${u.email}</td>
+                                <td class="py-2 text-gray-500">${u.city || '-'}</td>
+                                <td class="py-2 text-gray-400">${new Date(u.created_at).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            document.getElementById('recentUsers').innerHTML = '<p class="text-gray-400 text-sm">No users yet.</p>';
+        }
+
+        // Recent reports
+        if (data.recentReports.length > 0) {
+            document.getElementById('recentReports').innerHTML = `
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left py-2 text-gray-500">Property</th>
+                            <th class="text-left py-2 text-gray-500">Reason</th>
+                            <th class="text-left py-2 text-gray-500">Date</th>
+                            <th class="text-left py-2 text-gray-500">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.recentReports.map(r => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="py-2"><a href="/public/property.html?id=${r.property_id}" class="text-blue-600 hover:underline">${r.property_title}</a></td>
+                                <td class="py-2 text-red-500">${r.reason}</td>
+                                <td class="py-2 text-gray-400">${new Date(r.created_at).toLocaleDateString()}</td>
+                                <td class="py-2"><a href="/public/property.html?id=${r.property_id}" class="text-blue-600 text-xs hover:underline">View →</a></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            document.getElementById('recentReports').innerHTML = '<p class="text-gray-400 text-sm">No reports yet.</p>';
+        }
+
+        // Recent properties table
+        if (data.recentProperties.length > 0) {
+            document.getElementById('recentProperties').innerHTML = `
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left py-2 text-gray-500">Title</th>
+                            <th class="text-left py-2 text-gray-500">Location</th>
+                            <th class="text-left py-2 text-gray-500">Price</th>
+                            <th class="text-left py-2 text-gray-500">Type</th>
+                            <th class="text-left py-2 text-gray-500">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.recentProperties.map(p => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="py-2"><a href="/public/property.html?id=${p.id}" class="text-blue-600 hover:underline">${p.title}</a></td>
+                                <td class="py-2 text-gray-500">${p.location}</td>
+                                <td class="py-2 text-blue-600">₹${Number(p.price).toLocaleString()}</td>
+                                <td class="py-2 text-gray-500">${p.property_type || '-'}</td>
+                                <td class="py-2 text-gray-400">${new Date(p.created_at).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            document.getElementById('recentProperties').innerHTML = '<p class="text-gray-400 text-sm">No listings yet.</p>';
+        }
+
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+loadStats();
+</script>
+
+</body>
+</html>
