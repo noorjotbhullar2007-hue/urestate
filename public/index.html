@@ -171,12 +171,14 @@ async function loadProperties(filters = '') {
 
             propertyList.innerHTML = properties.map(p => `
                 <a href="/public/property.html?id=${p.id}" class="block bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden ${p.is_official ? 'border-2 border-yellow-400' : ''}">
-                    <div class="relative">
+                   <div class="relative">
                         ${p.thumbnail
-                            ? `<img src="${p.thumbnail.startsWith('http') ? p.thumbnail : 'https://urestate.onrender.com/' + p.thumbnail.replace(/\\/g,'/')}" class="h-48 w-full object-cover">`
+                            ? `<img src="${p.thumbnail.startsWith('http') ? p.thumbnail : 'https://urestate.onrender.com/' + p.thumbnail.replace(/\\/g,'/')}" class="h-48 w-full object-cover ${p.status !== 'available' ? 'opacity-60' : ''}">`
                             : `<div class="h-48 bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>`
                         }
                         ${p.is_official ? `<span class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">⭐ Verified by Urestate</span>` : ''}
+                        ${p.status === 'sold' ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">✅ SOLD</span>' : ''}
+                        ${p.status === 'rented' ? '<span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">🔑 RENTED</span>' : ''}
                     </div>
                     <div class="p-4">
                         <h2 class="font-bold text-lg text-gray-800">${p.title}</h2>

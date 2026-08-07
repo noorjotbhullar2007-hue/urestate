@@ -134,6 +134,8 @@ async function loadPropertyDetails() {
             <!-- Title & Price -->
             <div class="flex justify-between items-start mt-4">
                 <div>
+                    ${p.status === 'sold' ? '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center font-semibold">✅ This property has been SOLD</div>' : ''}
+                    ${p.status === 'rented' ? '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-center font-semibold">🔑 This property has been RENTED</div>' : ''}
                    <h1 class="text-2xl font-bold text-gray-800">${p.title}</h1>
 <p class="text-gray-500">${p.location}${p.address ? ' — ' + p.address : ''}</p>
 <p class="text-sm text-gray-400 mt-1">Listed by: <span class="font-semibold text-gray-600">${p.is_official ? '⭐ Urestate (Verified)' : p.owner_name}</span></p>
@@ -207,9 +209,9 @@ ${p.is_official ? '<span class="inline-block bg-yellow-400 text-yellow-900 text-
             <p class="text-gray-400 text-sm mt-6">Posted on: ${new Date(p.created_at).toLocaleDateString()}</p>
 
             <!-- Contact Owner -->
-            ${token && currentUser.id !== p.user_id ? `
+            ${token && currentUser.id !== p.user_id && p.status === 'available' ? `
             <div class="mt-6 border-t pt-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-3">Contact Owner</h2>
+             <h2 class="text-lg font-semibold text-gray-700 mb-3">Contact Owner</h2>
                 ${p.owner_phone ? `<p class="text-gray-600 mb-3">📞 <span class="font-semibold">${p.owner_phone}</span></p>` : ''}
                 ${p.owner_email ? `<p class="text-gray-600 mb-3">📧 <span class="font-semibold">${p.owner_email}</span></p>` : ''}
                 <textarea id="messageText" rows="3" placeholder="Write your message here..."
