@@ -362,9 +362,16 @@ async function loadMyProperties() {
                     ${p.status === 'rented' ? '<span class="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">🔑 RENTED</span>' : ''}
                 </div>
                 <div class="p-4">
-                    <h2 class="font-bold text-lg text-gray-800">${p.title}</h2>
+                   <h2 class="font-bold text-lg text-gray-800">${p.title}</h2>
                     <p class="text-gray-500">${p.location}</p>
                     <p class="text-blue-600 font-semibold mt-2">₹${Number(p.price).toLocaleString()} ${p.purpose === 'rent' ? '/month' : ''}</p>
+                    ${(() => {
+                        const days = Math.floor((new Date() - new Date(p.created_at)) / (1000 * 60 * 60 * 24));
+                        if (days > 30 && p.status === 'available') {
+                            return `<p class="text-xs text-orange-500 mt-1">⚠️ Listed ${days} days ago — still available?</p>`;
+                        }
+                        return '';
+                    })()}
                     <div class="flex justify-between mt-4 flex-wrap gap-1">
                     <a href="/public/property.html?id=${p.id}" class="text-blue-600 hover:underline text-sm">View</a>
                     <a href="/public/edit-property.html?id=${p.id}" class="text-green-600 hover:underline text-sm">Edit</a>
@@ -414,10 +421,17 @@ loadTopProfile();
 async function updateStatus(propertyId, currentStatus) {
     let newStatus;
     if (currentStatus === 'available') {
-        const choice = confirm('Click OK to mark as SOLD, or Cancel to mark as RENTED');
-        newStatus = choice ? 'sold' : 'rented';
+        const choice = prompt('Update status:\nType "sold" — Property is Sold\nType "rented" — Property is Rented\nType "cancel" or leave empty to cancel');
+        if (!choice || choice.toLowerCase() === 'cancel') return;
+        if (choice.toLowerCase() === 'sold') newStatus = 'sold';
+        else if (choice.toLowerCase() === 'rented') newStatus = 'rented';
+        else {
+            alert('Invalid input. Please type "sold" or "rented".');
+            return;
+        }
     } else {
-        if (!confirm('Mark this property as Available again?')) return;
+        const choice = confirm(`This property is currently marked as "${currentStatus}". Click OK to mark it as Available again.`);
+        if (!choice) return;
         newStatus = 'available';
     }
 
