@@ -23,6 +23,11 @@ app.use('/api/properties', propertyRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Health check route for UptimeRobot
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
 // Test route
 app.get('/', (req, res) => {
     res.send('Property App Server is Running!');
