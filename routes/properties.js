@@ -155,11 +155,11 @@ router.put('/:id', protect, (req, res) => {
     const propertyId = req.params.id;
     const userId = req.userId;
     const {
-        title, description, price, location, property_type, purpose,
-        negotiable_price, address, plot_size, built_up_area, carpet_area,
-        floor_number, total_floors, bedrooms, bathrooms, balconies,
-        parking, furnished_status, property_age, facing, ownership_type,
-        availability_date, nearby_landmarks, latitude, longitude
+    title, description, price, location, property_type, purpose,
+    negotiable_price, address, plot_size, built_up_area, carpet_area,
+    floor_number, total_floors, bedrooms, bathrooms, balconies,
+    parking, furnished_status, property_age, facing, ownership_type,
+    availability_date, nearby_landmarks, latitude, longitude
     } = req.body;
 
     const checkSql = 'SELECT * FROM properties WHERE id = ?';
