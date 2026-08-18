@@ -170,6 +170,7 @@ router.put('/:id', protect, (req, res) => {
         if (results[0].user_id !== userId) {
             return res.status(403).json({ message: 'You are not authorized to edit this property' });
         }
+        const existingIsOfficial = results[0].is_official;
 
         const updateSql = `UPDATE properties SET 
             title=?, description=?, price=?, location=?, property_type=?, purpose=?,
@@ -184,7 +185,7 @@ router.put('/:id', protect, (req, res) => {
             negotiable_price === 'true' ? 1 : 0, address, plot_size || null, built_up_area || null, carpet_area || null,
             floor_number || null, total_floors || null, bedrooms, bathrooms, balconies || null,
             parking === 'true' ? 1 : 0, furnished_status, property_age, facing || null, ownership_type || null,
-            availability_date || null, nearby_landmarks || null, latitude || null, longitude || null, is_official === true ? 1 : 0, propertyId
+           availability_date || null, nearby_landmarks || null, latitude || null, longitude || null, existingIsOfficial, propertyId
         ], (updateErr) => {
             if (updateErr) return res.status(500).json({ message: 'Error updating property', error: updateErr });
             res.json({ message: 'Property updated successfully!' });
