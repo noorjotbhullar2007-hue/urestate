@@ -280,9 +280,14 @@ async function loadProperty() {
 
     // Show existing images (always show this section, even with zero images,
 // so the "Add Images" upload option is always available)
-    const section = document.getElementById('currentImagesSection');
-    section.classList.remove('hidden');
-    displayCurrentImages(p.images || []);
+           const section = document.getElementById('currentImagesSection');
+        section.classList.remove('hidden');
+        displayCurrentImages(p.images || []);
+
+    } catch (error) {
+        document.getElementById('message').textContent = 'Error loading property details.';
+    }
+}
 
 loadProperty();
 
