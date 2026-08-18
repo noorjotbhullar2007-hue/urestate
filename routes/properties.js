@@ -211,10 +211,20 @@ router.delete('/:id', protect, (req, res) => {
         db.query(deleteImagesSql, [propertyId], (imgErr) => {
             if (imgErr) return res.status(500).json({ message: 'Error deleting property images', error: imgErr });
 
-            const deleteSql = 'DELETE FROM properties WHERE id = ?';
-            db.query(deleteSql, [propertyId], (deleteErr) => {
-                if (deleteErr) return res.status(500).json({ message: 'Error deleting property', error: deleteErr });
-                res.json({ message: 'Property deleted successfully!' });
+            const deleteMessagesSql = 'DELETE FROM messages WHERE property_id = ?';
+            db.query(deleteMessagesSql, [propertyId], (msgErr) => {
+                if (msgErr) return res.status(500).json({ message: 'Error deleting property messages', error: msgErr });
+
+                const deleteReportsSql = 'DELETE FROM reports WHERE property_id = ?';
+                db.query(deleteReportsSql, [propertyId], (repErr) => {
+                    if (repErr) return res.status(500).json({ message: 'Error deleting property reports', error: repErr });
+
+                    const deleteSql = 'DELETE FROM properties WHERE id = ?';
+                    db.query(deleteSql, [propertyId], (deleteErr) => {
+                        if (deleteErr) return res.status(500).json({ message: 'Error deleting property', error: deleteErr });
+                        res.json({ message: 'Property deleted successfully!' });
+                    });
+                });
             });
         });
     });
