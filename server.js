@@ -28,9 +28,9 @@ app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
 
-// Test route
+// Redirect root to homepage
 app.get('/', (req, res) => {
-    res.send('Property App Server is Running!');
+    res.redirect('/public/index.html');
 });
 
 // Start server
