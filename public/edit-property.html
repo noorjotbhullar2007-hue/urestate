@@ -248,7 +248,7 @@ const propertyId = params.get('id');
 
 async function loadProperty() {
     try {
-        const res = await fetch(`https://urestate.onrender.com/api/properties/${propertyId}`);
+        const res = await fetch(`/api/properties/${propertyId}`);
         const p = await res.json();
 
         // Pre-fill all fields
@@ -324,7 +324,7 @@ document.getElementById('editPropertyForm').addEventListener('submit', async (e)
     };
 
     try {
-        const res = await fetch(`https://urestate.onrender.com/api/properties/${propertyId}`, {
+        const res = await fetch(`/api/properties/${propertyId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -380,7 +380,7 @@ function displayCurrentImages(images) {
 
     grid.innerHTML = images.map((img, index) => `
         <div class="relative" id="imgContainer-${index}">
-            <img src="${img.startsWith('http') ? img : 'https://urestate.onrender.com/' + img.replace(/\\/g,'/')}"
+            <img src="${img.startsWith('http') ? img : '/' + img.replace(/\\/g,'/')}"
                 class="w-full h-24 object-cover rounded border">
             <button type="button" onclick="deleteImage(${index})"
                 class="absolute top-1 right-1 bg-red-500 text-white text-xs px-1 rounded hover:bg-red-600">
@@ -395,11 +395,11 @@ async function deleteImage(index) {
 
     // Get image ID from database
     try {
-        const res = await fetch(`https://urestate.onrender.com/api/properties/${propertyId}`);
+        const res = await fetch(`/api/properties/${propertyId}`);
         const p = await res.json();
 
         // We need image IDs — let's fetch them separately
-        const imgRes = await fetch(`https://urestate.onrender.com/api/properties/images/${propertyId}`, {
+        const imgRes = await fetch(`/api/properties/images/${propertyId}`, {
             headers: { 'Authorization': 'Bearer ' + token }
         });
 
@@ -411,7 +411,7 @@ async function deleteImage(index) {
         const imgData = await imgRes.json();
         const imageId = imgData[index].id;
 
-        const deleteRes = await fetch(`https://urestate.onrender.com/api/properties/image/${imageId}`, {
+        const deleteRes = await fetch(`/api/properties/image/${imageId}`, {
             method: 'DELETE',
             headers: { 'Authorization': 'Bearer ' + token }
         });
@@ -459,7 +459,7 @@ async function uploadNewImages() {
     Array.from(files).forEach(file => formData.append('images', file));
 
     try {
-        const res = await fetch(`https://urestate.onrender.com/api/properties/image/${propertyId}`, {
+        const res = await fetch(`/api/properties/image/${propertyId}`, {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token },
             body: formData

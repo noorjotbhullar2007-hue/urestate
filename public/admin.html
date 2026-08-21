@@ -122,7 +122,7 @@ document.getElementById('adminName').textContent = 'Welcome, ' + user.name;
 
 async function loadStats() {
     try {
-        const res = await fetch('https://urestate.onrender.com/api/admin/stats', {
+        const res = await fetch('/api/admin/stats', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         const data = await res.json();

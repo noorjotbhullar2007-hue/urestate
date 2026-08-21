@@ -56,7 +56,7 @@ document.getElementById('verifyForm').addEventListener('submit', async (e) => {
     const messageEl = document.getElementById('message');
 
     try {
-        const res = await fetch('https://urestate.onrender.com/api/auth/verify-otp', {
+        const res = await fetch('/api/auth/verify-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, otp })

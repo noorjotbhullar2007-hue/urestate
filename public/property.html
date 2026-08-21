@@ -83,7 +83,7 @@ async function loadPropertyDetails() {
     }
 
     try {
-        const res = await fetch(`https://urestate.onrender.com/api/properties/${propertyId}`);
+        const res = await fetch(`/api/properties/${propertyId}`);
         if (!res.ok) {
             container.innerHTML = '<p class="text-red-500">Property not found.</p>';
             return resolve();
@@ -97,7 +97,7 @@ async function loadPropertyDetails() {
     <div class="relative w-full h-72 bg-gray-200 rounded overflow-hidden mb-2">
         <!-- Images -->
         ${p.images.map((img, index) => `
-            <img src="${img.startsWith('http') ? img : 'https://urestate.onrender.com/' + img.replace(/\\/g,'/')}" 
+            <img src="${img.startsWith('http') ? img : '/' + img.replace(/\\/g,'/')}" 
                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0'}"
                 data-index="${index}">
         `).join('')}
@@ -276,7 +276,7 @@ async function sendMessage(propertyId, ownerId) {
     }
 
     try {
-        const res = await fetch('https://urestate.onrender.com/api/messages/send', {
+        const res = await fetch('/api/messages/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -355,7 +355,7 @@ async function submitReport(propertyId) {
     }
 
     try {
-        const res = await fetch(`https://urestate.onrender.com/api/properties/report/${propertyId}`, {
+        const res = await fetch(`/api/properties/report/${propertyId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
