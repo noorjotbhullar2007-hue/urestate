@@ -1,6 +1,30 @@
-const sgMail = require('@sendgrid/mail');
+// const sgMail = require('@sendgrid/mail');
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// TEMP: send through Brevo because the SendGrid trial ended.
+// This keeps every existing sgMail.send(msg) call below working.
+const sgMail = {
+    send: async (msg) => {
+        const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json',
+                'api-key': process.env.BREVO_API_KEY
+            },
+            body: JSON.stringify({
+                sender: { name: msg.from.name, email: msg.from.email },
+                to: [{ email: msg.to }],
+                subject: msg.subject,
+                htmlContent: msg.html
+            })
+        });
+        if (!res.ok) {
+            throw new Error('Brevo error ' + res.status + ': ' + (await res.text()));
+        }
+        return res.json();
+    }
+};
 
 // Send notification email to property owner
 const sendMessageNotification = async (ownerEmail, ownerName, senderName, propertyTitle, message) => {
