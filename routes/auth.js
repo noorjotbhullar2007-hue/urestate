@@ -21,7 +21,7 @@ router.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const sql = 'INSERT INTO users (name, email, password, phone, city, otp, otp_expires, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        db.query(sql, [name, email, hashedPassword, phone, city, otp, otpExpires, true /* TEMP: was false */], async (err, result) => {
+        db.query(sql, [name, email, hashedPassword, phone, city, otp, otpExpires, false], async (err, result) => {
             if (err) {
                 console.error(err);
                 if (err.code === 'ER_DUP_ENTRY') {
@@ -31,11 +31,10 @@ router.post('/register', async (req, res) => {
             }
 
             // Send OTP email
-        // await sendOTPEmail(email, name, otp);
+        await sendOTPEmail(email, name, otp);
 
                 res.status(201).json({ 
-                    //message: 'Registration successful! Please check your email for the OTP verification code.',
-                    message: 'Registration successful! You can now log in.',
+                    message: 'Registration successful! Please check your email for the OTP verification code.',
                     email: email
                 });
         });
